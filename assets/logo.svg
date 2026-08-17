@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 550 160" width="100%" height="100%">
+  <!-- Shield Icon Group -->
+  <g transform="translate(10, 10)">
+    <!-- Outer Shield Border -->
+    <path d="M 70 10 L 120 28 C 120 85, 100 120, 70 140 C 40 120, 20 85, 20 28 Z" fill="#1B3A5F" stroke="#1B3A5F" stroke-width="4"/>
+    <!-- Inner White Shield Cutout -->
+    <path d="M 70 18 L 112 33 C 112 80, 95 110, 70 128 C 45 110, 28 80, 28 33 Z" fill="#FFFFFF"/>
+    <!-- Inner Navy Shield Area -->
+    <path d="M 70 24 L 106 37 C 106 75, 91 103, 70 119 C 49 103, 34 75, 34 37 Z" fill="#1B3A5F"/>
+    
+    <!-- Map Grid Lines in Bottom Shield -->
+    <path d="M 40 85 L 100 85 M 48 100 L 92 100 M 55 70 L 40 105 M 85 70 L 100 105 M 70 70 L 70 115" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+
+    <!-- Map Pin Icon (Gold Outer, White Fill, Navy Center Dot) -->
+    <path d="M 70 36 C 58 36, 48 46, 48 58 C 48 74, 70 96, 70 96 C 70 96, 92 74, 92 58 C 92 46, 82 36, 70 36 Z" fill="#FFFFFF" stroke="#C9A227" stroke-width="4.5"/>
+    <circle cx="70" cy="56" r="6" fill="#1B3A5F"/>
+  </g>
+
+  <!-- Text Group -->
+  <g transform="translate(155, 35)">
+    <!-- PROPVIGIL Brand Name -->
+    <text x="0" y="45" font-family="'Outfit', 'Plus Jakarta Sans', 'Space Grotesk', sans-serif" font-size="52" font-weight="800" fill="#1B3A5F" letter-spacing="2">PROPVIGIL</text>
+    
+    <!-- Gold Underline -->
+    <line x1="0" y1="58" x2="365" y2="58" stroke="#C9A227" stroke-width="3.5"/>
+    
+    <!-- Tagline -->
+    <text x="0" y="78" font-family="'Plus Jakarta Sans', sans-serif" font-size="14.5" font-weight="600" fill="#1B3A5F" letter-spacing="0.2">Monitor, Maintain, and Report: Trusted Property Care</text>
+  </g>
+</svg>

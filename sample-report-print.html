@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PropVigil Site Inspection Report PV-2026-0041</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    body {
+      background: #FFFFFF;
+      color: #1B3A5F;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .page {
+      width: 210mm;
+      height: 297mm;
+      padding: 20mm;
+      position: relative;
+      page-break-after: always;
+      background: #FFFFFF;
+    }
+    /* Page 1 Navy Theme Cover */
+    .page-cover {
+      background: #1B3A5F;
+      color: #FFFFFF;
+    }
+    .cover-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+    .shield-svg {
+      width: 48px;
+      height: 48px;
+    }
+    .cover-title {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #FFFFFF;
+    }
+    .cover-subtitle {
+      font-size: 16px;
+      color: #C9A227;
+      margin-bottom: 40px;
+    }
+    .meta-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 50px;
+    }
+    .meta-table td {
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      font-size: 14px;
+    }
+    .meta-label {
+      color: #94A3B8;
+      width: 40%;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+    }
+    .meta-value {
+      font-weight: bold;
+      color: #FFFFFF;
+    }
+    .cover-status-box {
+      background: #C9A227;
+      color: #1B3A5F;
+      padding: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 4px;
+      margin-top: 40px;
+    }
+    .cover-footer {
+      position: absolute;
+      bottom: 20mm;
+      left: 20mm;
+      right: 20mm;
+      font-size: 11px;
+      color: #94A3B8;
+      border-top: 1px solid rgba(255,255,255,0.15);
+      padding-top: 12px;
+    }
+    
+    /* Pages 2-6 Header */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #1B3A5F;
+      padding-bottom: 12px;
+      margin-bottom: 24px;
+    }
+    .header-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #1B3A5F;
+    }
+    .header-sub {
+      font-size: 12px;
+      color: #C9A227;
+      font-weight: bold;
+    }
+
+    .section-head {
+      font-size: 11px;
+      font-weight: bold;
+      color: #C9A227;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 20px;
+      margin-bottom: 6px;
+      border-bottom: 1px solid #C9A227;
+      padding-bottom: 2px;
+    }
+
+    .summary-box {
+      background: #F8FAFC;
+      border-left: 4px solid #C9A227;
+      padding: 14px;
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+
+    .checklist-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    .checklist-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #E2E8F0;
+      font-size: 12px;
+    }
+    .dot-pass { color: #10B981; font-weight: bold; }
+    .dot-warn { color: #F59E0B; font-weight: bold; }
+
+    .photo-grid-2x2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .photo-box {
+      border: 1px dashed #CBD5E1;
+      background: #F8FAFC;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .photo-img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+    }
+    .photo-caption {
+      padding: 10px;
+    }
+    .photo-pos {
+      background: #1B3A5F;
+      color: #FFFFFF;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 2px 6px;
+      display: inline-block;
+      border-radius: 2px;
+      margin-bottom: 4px;
+    }
+
+    .page-footer {
+      position: absolute;
+      bottom: 15mm;
+      left: 20mm;
+      right: 20mm;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #64748B;
+      border-top: 1px solid #E2E8F0;
+      padding-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PAGE 1: COVER -->
+  <div class="page page-cover">
+    <div class="cover-logo">
+      <svg class="shield-svg" viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        <circle cx="12" cy="11" r="3"/>
+      </svg>
+      <div>
+        <h1 style="font-size: 24px; letter-spacing: 2px; color: white;">PROPVIGIL</h1>
+        <span style="font-size: 11px; color: #C9A227;">Monitor, Maintain, and Report: Trusted Property Care</span>
+      </div>
+    </div>
+
+    <h2 class="cover-title">Site Inspection Report</h2>
+    <div class="cover-subtitle">Vacant site · Scheduled quarterly visit</div>
+
+    <table class="meta-table">
+      <tr>
+        <td class="meta-label">PROPERTY REFERENCE</td>
+        <td class="meta-value">PV-2026-0041</td>
+      </tr>
+      <tr>
+        <td class="meta-label">SITE</td>
+        <td class="meta-value">Site No. 00, 0th Cross, [Layout], Bengaluru 5600XX</td>
+      </tr>
+      <tr>
+        <td class="meta-label">DIMENSIONS</td>
+        <td class="meta-value">30 x 40 ft — 1,200 sq ft</td>
+      </tr>
+      <tr>
+        <td class="meta-label">OWNER</td>
+        <td class="meta-value">[Owner name]</td>
+      </tr>
+      <tr>
+        <td class="meta-label">VISIT DATE</td>
+        <td class="meta-value">14 August 2026</td>
+      </tr>
+      <tr>
+        <td class="meta-label">TIME ON SITE</td>
+        <td class="meta-value">10:30 to 11:15 IST</td>
+      </tr>
+      <tr>
+        <td class="meta-label">INSPECTED BY</td>
+        <td class="meta-value">[Inspector name], PropVigil</td>
+      </tr>
+      <tr>
+        <td class="meta-label">REPORT ISSUED</td>
+        <td class="meta-value">14 August 2026</td>
+      </tr>
+      <tr>
+        <td class="meta-label">VISIT NUMBER</td>
+        <td class="meta-value">3 of 4 — current plan year</td>
+      </tr>
+    </table>
+
+    <div class="cover-status-box">
+      STATUS AT THIS VISIT:<br>
+      ACTION RECOMMENDED — see page 5
+    </div>
+
+    <div class="cover-footer">
+      This is a sample report prepared on a demonstration site.<br>
+      PropVigil · A unit of Sai Krupa Associates · Bengaluru · +91 92421 43775
+    </div>
+  </div>
+
+  <!-- PAGE 2: SUMMARY -->
+  <div class="page">
+    <div class="header-bar">
+      <div>
+        <div class="header-title">PROPVIGIL</div>
+      </div>
+      <div style="text-align: right;">
+        <div class="header-title">Summary of visit</div>
+        <div class="header-sub">PV-2026-0041 · 14 August 2026</div>
+      </div>
+    </div>
+
+    <div class="section-head">IN ONE LINE</div>
+    <div class="summary-box">
+      The site is secure and the boundary is unchanged. Construction waste has been dumped along the northern edge since the last visit, and overgrowth has reached roughly knee height across the site. Neither is urgent. Both are worth clearing before the next monsoon.
+    </div>
+
+    <div class="section-head">CHECKED AT THIS VISIT</div>
+    <table class="checklist-table">
+      <tr>
+        <td><span class="dot-pass">●</span> <strong>Boundary markers</strong></td>
+        <td>All four present, positions unchanged</td>
+      </tr>
+      <tr>
+        <td><span class="dot-pass">●</span> <strong>Compound wall / fencing</strong></td>
+        <td>Intact. Minor rust on gate hinge</td>
+      </tr>
+      <tr>
+        <td><span class="dot-pass">●</span> <strong>Encroachment</strong></td>
+        <td>None observed</td>
+      </tr>
+      <tr>
+        <td><span class="dot-warn">●</span> <strong>Waste and debris</strong></td>
+        <td>Construction debris, northern edge — new</td>
+      </tr>
+      <tr>
+        <td><span class="dot-warn">●</span> <strong>Overgrowth</strong></td>
+        <td>Knee height across site — action advised</td>
+      </tr>
+      <tr>
+        <td><span class="dot-pass">●</span> <strong>Access road</strong></td>
+        <td>Motorable. No obstruction</td>
+      </tr>
+      <tr>
+        <td><span class="dot-pass">●</span> <strong>Ownership signage</strong></td>
+        <td>Present and legible</td>
+      </tr>
+      <tr>
+        <td><span class="dot-pass">●</span> <strong>Standing water</strong></td>
+        <td>None</td>
+      </tr>
+      <tr>
+        <td><span class="dot-pass">●</span> <strong>Notices or markings</strong></td>
+        <td>None on or near the site</td>
+      </tr>
+      <tr>
+        <td><span class="dot-pass">●</span> <strong>Neighbouring activity</strong></td>
+        <td>Construction on adjoining plot — monitoring</td>
+      </tr>
+    </table>
+
+    <div class="section-head">CHANGED SINCE LAST VISIT — 14 AUGUST 2026</div>
+    <p style="margin-bottom: 16px;">Two changes. Construction debris has appeared along the northern boundary, most likely from the adjoining plot where building work began recently. Overgrowth has increased from ankle to knee height. Everything else is as recorded at the previous visit.</p>
+
+    <div class="section-head">WHAT WE RECOMMEND</div>
+    <div style="background: #FFFBEB; border: 1px solid #FCD34D; padding: 14px; border-radius: 4px;">
+      Clear the debris and cut back the overgrowth. Quotation on page 5.<br>
+      <strong>Nothing will be carried out until you approve it in writing.</strong>
+    </div>
+
+    <div class="page-footer">
+      <span>SAMPLE REPORT — prepared on a demonstration site</span>
+      <span>PropVigil · +91 92421 43775 · Page 2</span>
+    </div>
+  </div>
+
+  <!-- PAGE 3: CAMERA POSITIONS -->
+  <div class="page">
+    <div class="header-bar">
+      <div><div class="header-title">PROPVIGIL</div></div>
+      <div style="text-align: right;">
+        <div class="header-title">Photographic record</div>
+        <div class="header-sub">Fixed camera positions</div>
+      </div>
+    </div>
+
+    <p style="margin-bottom: 16px; font-size: 12px; color: #475569;">We photograph from the same four positions on every visit, so consecutive reports can be compared directly. Each image carries its GPS coordinates and the date and time it was taken.</p>
+
+    <div class="photo-grid-2x2">
+      <div class="photo-box">
+        <img src="assets/hero.jpg" class="photo-img">
+        <div class="photo-caption">
+          <span class="photo-pos">POSITION A</span>
+          <h4 style="font-size: 12px; margin-top: 4px;">North-east corner, facing south-west</h4>
+          <p style="font-size: 11px; color: #64748B;">Wide shot showing full site, visible boundaries and adjoining plot.</p>
+          <div style="font-family: monospace; font-size: 10px; color: #C9A227; margin-top: 4px;">Geotag 12.9716 N, 77.5946 E · 14 Aug 2026</div>
+        </div>
+      </div>
+
+      <div class="photo-box">
+        <img src="assets/hero.jpg" class="photo-img">
+        <div class="photo-caption">
+          <span class="photo-pos">POSITION B</span>
+          <h4 style="font-size: 12px; margin-top: 4px;">South-west corner, facing north-east</h4>
+          <p style="font-size: 11px; color: #64748B;">Opposite wide shot. Together A and B cover the whole site.</p>
+          <div style="font-family: monospace; font-size: 10px; color: #C9A227; margin-top: 4px;">Geotag 12.9716 N, 77.5946 E · 14 Aug 2026</div>
+        </div>
+      </div>
+
+      <div class="photo-box">
+        <img src="assets/before.jpg" class="photo-img">
+        <div class="photo-caption">
+          <span class="photo-pos">POSITION C</span>
+          <h4 style="font-size: 12px; margin-top: 4px;">Road frontage, facing the site</h4>
+          <p style="font-size: 11px; color: #64748B;">Access, gate, ownership signage and approach condition.</p>
+          <div style="font-family: monospace; font-size: 10px; color: #C9A227; margin-top: 4px;">Geotag 12.9716 N, 77.5946 E · 14 Aug 2026</div>
+        </div>
+      </div>
+
+      <div class="photo-box">
+        <img src="assets/after.jpg" class="photo-img">
+        <div class="photo-caption">
+          <span class="photo-pos">POSITION D</span>
+          <h4 style="font-size: 12px; margin-top: 4px;">Centre of site, facing north</h4>
+          <p style="font-size: 11px; color: #64748B;">Ground condition, overgrowth height and dumping examination.</p>
+          <div style="font-family: monospace; font-size: 10px; color: #C9A227; margin-top: 4px;">Geotag 12.9716 N, 77.5946 E · 14 Aug 2026</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>SAMPLE REPORT — prepared on a demonstration site</span>
+      <span>PropVigil · +91 92421 43775 · Page 3</span>
+    </div>
+  </div>
+
+  <!-- PAGE 4: DETAIL & FINDINGS -->
+  <div class="page">
+    <div class="header-bar">
+      <div><div class="header-title">PROPVIGIL</div></div>
+      <div style="text-align: right;">
+        <div class="header-title">Photographic record</div>
+        <div class="header-sub">Detail and findings</div>
+      </div>
+    </div>
+
+    <div class="section-head">BOUNDARY AND MARKERS</div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px;">
+      <div class="photo-box">
+        <img src="assets/after.jpg" style="height: 120px; width: 100%; object-fit: cover;">
+        <div style="padding: 8px;">
+          <strong>Marker 1 — NE</strong>
+          <p style="font-size: 10px; color: #64748B;">Close shot of boundary stone</p>
+        </div>
+      </div>
+      <div class="photo-box">
+        <img src="assets/after.jpg" style="height: 120px; width: 100%; object-fit: cover;">
+        <div style="padding: 8px;">
+          <strong>Marker 2 — SE</strong>
+          <p style="font-size: 10px; color: #64748B;">Same angle each visit</p>
+        </div>
+      </div>
+      <div class="photo-box">
+        <img src="assets/before.jpg" style="height: 120px; width: 100%; object-fit: cover;">
+        <div style="padding: 8px;">
+          <strong>Gate and hinge</strong>
+          <p style="font-size: 10px; color: #64748B;">Detail of noted hinge rust</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-head">WASTE AND OVERGROWTH — ACTION ITEMS</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+      <div class="photo-box">
+        <img src="assets/before.jpg" style="height: 140px; width: 100%; object-fit: cover;">
+        <div style="padding: 10px;">
+          <strong>Debris — northern edge</strong>
+          <p style="font-size: 11px; color: #64748B;">Dumped construction material along boundary</p>
+        </div>
+      </div>
+      <div class="photo-box">
+        <img src="assets/before.jpg" style="height: 140px; width: 100%; object-fit: cover;">
+        <div style="padding: 10px;">
+          <strong>Overgrowth — site centre</strong>
+          <p style="font-size: 11px; color: #64748B;">Height shown against marked pole</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #F1F5F9; border: 1px solid #CBD5E1; padding: 16px; border-radius: 4px;">
+      <strong style="color: #1B3A5F;">VIDEO WALK-THROUGH</strong>
+      <p style="font-size: 12px; margin-top: 4px;">A continuous walk of the site boundary is sent with this report by WhatsApp. Duration approx. 2 minutes.</p>
+    </div>
+
+    <div class="page-footer">
+      <span>SAMPLE REPORT — prepared on a demonstration site</span>
+      <span>PropVigil · +91 92421 43775 · Page 4</span>
+    </div>
+  </div>
+
+  <!-- PAGE 5: COMPARISON -->
+  <div class="page">
+    <div class="header-bar">
+      <div><div class="header-title">PROPVIGIL</div></div>
+      <div style="text-align: right;">
+        <div class="header-title">Comparison</div>
+        <div class="header-sub">This visit against the last</div>
+      </div>
+    </div>
+
+    <p style="margin-bottom: 16px; font-size: 12px;">The same frame, three months apart. One report is a snapshot. Four reports are a record.</p>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+      <div class="photo-box">
+        <div style="background: #1B3A5F; color: white; padding: 4px 8px; font-size: 11px; font-weight: bold;">THEN — PREVIOUS VISIT</div>
+        <img src="assets/before.jpg" style="height: 160px; width: 100%; object-fit: cover;">
+      </div>
+      <div class="photo-box">
+        <div style="background: #C9A227; color: #1B3A5F; padding: 4px 8px; font-size: 11px; font-weight: bold;">NOW — THIS VISIT</div>
+        <img src="assets/after.jpg" style="height: 160px; width: 100%; object-fit: cover;">
+      </div>
+    </div>
+
+    <div class="section-head">WHAT THE COMPARISON SHOWS</div>
+    <p style="margin-bottom: 20px;">Boundary line unchanged. Marker positions unchanged. Debris present in the current frame and absent in the previous one. Overgrowth visibly higher.</p>
+
+    <div class="section-head">RECOMMENDED ACTION AND COST</div>
+    <table class="checklist-table" style="margin-top: 10px;">
+      <thead>
+        <tr style="background: #1B3A5F; color: white;">
+          <th style="padding: 8px; text-align: left;">WORK</th>
+          <th style="padding: 8px; text-align: left;">WHY</th>
+          <th style="padding: 8px; text-align: right;">QUOTED</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Debris removal and disposal</td>
+          <td>Bye-law 18(1)(b) obligation</td>
+          <td style="text-align: right;">Quoted Separately</td>
+        </tr>
+        <tr>
+          <td>Weed and overgrowth cutting</td>
+          <td>Monsoon, pests, standing water</td>
+          <td style="text-align: right;">Quoted Separately</td>
+        </tr>
+        <tr>
+          <td>Gate hinge treatment</td>
+          <td>Preventive anti-rust</td>
+          <td style="text-align: right;">Included Free</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="font-size: 11px; color: #64748B; margin-top: 12px;">Quoted separately and approved by you in writing before anything starts. You receive the vendor invoice, the disposal receipt where the facility issues one, and photographs of the completed work.</p>
+
+    <div class="page-footer">
+      <span>SAMPLE REPORT — prepared on a demonstration site</span>
+      <span>PropVigil · +91 92421 43775 · Page 5</span>
+    </div>
+  </div>
+
+  <!-- PAGE 6: VERIFICATION -->
+  <div class="page">
+    <div class="header-bar">
+      <div><div class="header-title">PROPVIGIL</div></div>
+      <div style="text-align: right;">
+        <div class="header-title">Verification</div>
+        <div class="header-sub">How to check this report</div>
+      </div>
+    </div>
+
+    <div class="section-head">EVERY PHOTOGRAPH IS VERIFIABLE</div>
+    <p style="margin-bottom: 16px;">Each image in this report carries its original EXIF metadata: GPS coordinates, date, time and device. We have not stripped it. Ask us and we will send you the original files so you can check them yourself.</p>
+
+    <div class="section-head">WHY WE SHOOT FROM FIXED POSITIONS</div>
+    <p style="margin-bottom: 16px;">Photographs taken from the same four positions every visit cannot easily be reused. The light, the season and the ground conditions differ each time, and a repeated image is obvious when the frames are placed side by side. The metadata settles it either way.</p>
+
+    <div class="section-head">WHO VISITED</div>
+    <p style="margin-bottom: 16px;">This visit was carried out by [Inspector name] on 14 August 2026, between 10:30 and 11:15 IST. If you have a question about anything in this report, there is a named person who was there to answer it.</p>
+
+    <div class="section-head">WHAT WE DID NOT DO</div>
+    <ul style="padding-left: 20px; line-height: 1.8; margin-bottom: 30px;">
+      <li>We did not enter or alter the property beyond what is needed to inspect and photograph it.</li>
+      <li>We did not carry out any work or spend any money. Nothing is done without your written approval.</li>
+      <li>We do not hold Power of Attorney for this property and we do not hold your original documents.</li>
+      <li>We do not give legal advice. Where a matter needs a lawyer, we say so.</li>
+    </ul>
+
+    <div style="background: #1B3A5F; color: white; padding: 20px; border-radius: 4px;">
+      <div style="color: #C9A227; font-weight: bold; font-size: 12px; text-transform: uppercase;">QUESTIONS ABOUT THIS REPORT</div>
+      <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">V P Srinivasa · +91 92421 43775 · call or WhatsApp</div>
+      <div style="font-size: 12px; color: #94A3B8; margin-top: 4px;">PropVigil, a unit of Sai Krupa Associates, Bengaluru. We reply within one working day.</div>
+    </div>
+
+    <div class="page-footer">
+      <span>SAMPLE REPORT — prepared on a demonstration site</span>
+      <span>PropVigil · +91 92421 43775 · Page 6</span>
+    </div>
+  </div>
+
+</body>
+</html>
