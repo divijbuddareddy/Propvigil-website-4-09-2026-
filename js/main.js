@@ -6,11 +6,34 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   initPropertyAccordions();
+  initPropertyTabs();
   initFaqAccordions();
   initFormHandler();
   initMobileNav();
   initScrollReveal();
+  initFeeEstimator();
 });
+
+// Interactive Property Category Tab Switcher
+function initPropertyTabs() {
+  const tabBtns = document.querySelectorAll('.prop-tab-btn');
+  const tabPanels = document.querySelectorAll('.prop-tab-panel');
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.getAttribute('data-tab');
+
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabPanels.forEach(p => p.classList.remove('active'));
+
+      btn.classList.add('active');
+      const targetPanel = document.getElementById(targetId);
+      if (targetPanel) {
+        targetPanel.classList.add('active');
+      }
+    });
+  });
+}
 
 // Section 2 Property Type In-Place Accordion
 function initPropertyAccordions() {
@@ -106,4 +129,58 @@ function initFormHandler() {
       alert('Thank you! Your request has been formatted and opened in WhatsApp. We will reply within one working day.');
     });
   }
+}
+
+// Interactive Property Fee Estimator Engine
+function initFeeEstimator() {
+  const propSelect = document.getElementById('est-proptype');
+  const zoneSelect = document.getElementById('est-zone');
+  const planSelect = document.getElementById('est-plan');
+  const priceDisplay = document.getElementById('est-price-val');
+  const subtitleDisplay = document.getElementById('est-subtitle');
+  const bookBtn = document.getElementById('est-book-btn');
+
+  if (!propSelect || !priceDisplay) return;
+
+  function updateEstimate() {
+    const prop = propSelect.value;
+    const zone = zoneSelect.value;
+    const plan = planSelect.value;
+
+    let firstVisitFee = zone === 'outskirts' ? 3500 : 2500;
+    let annualFee = 16000;
+    let freqText = '4 inspections / year';
+
+    if (prop === 'site') {
+      annualFee = plan === 'monthly' ? 28000 : 16000;
+      freqText = plan === 'monthly' ? '12 inspections / year' : '4 inspections / year';
+    } else if (prop === 'unoccupied') {
+      annualFee = plan === 'monthly' ? 36000 : 22000;
+      freqText = plan === 'monthly' ? '12 inspections / year' : '4 inspections / year';
+    } else if (prop === 'rented') {
+      annualFee = 44000;
+      freqText = '12 inspections / year (Monthly)';
+    } else if (prop === 'construction') {
+      annualFee = plan === 'monthly' ? 36000 : 24000;
+      freqText = plan === 'monthly' ? '12 inspections / year' : '4 inspections / year';
+    }
+
+    if (plan === 'first_visit') {
+      priceDisplay.textContent = `₹${firstVisitFee.toLocaleString('en-IN')}`;
+      subtitleDisplay.textContent = `One-time first visit fee (${zone === 'outskirts' ? 'Outskirts' : 'Bengaluru City Limits'}). Credited 100% against your annual plan.`;
+    } else {
+      priceDisplay.textContent = `₹${annualFee.toLocaleString('en-IN')} / yr`;
+      subtitleDisplay.textContent = `${freqText}. Includes geotagged PDF report & WhatsApp video update on every visit.`;
+    }
+
+    if (bookBtn) {
+      const msg = `Hello PropVigil Team,%0A%0AI used the website estimator:%0A- Property Type: ${encodeURIComponent(propSelect.options[propSelect.selectedIndex].text)}%0A- Zone: ${encodeURIComponent(zoneSelect.options[zoneSelect.selectedIndex].text)}%0A- Plan Selected: ${encodeURIComponent(planSelect.options[planSelect.selectedIndex].text)}%0A- Estimated Fee: ${priceDisplay.textContent}%0A%0APlease confirm my inspection date.`;
+      bookBtn.href = `https://wa.me/919242143775?text=${msg}`;
+    }
+  }
+
+  propSelect.addEventListener('change', updateEstimate);
+  zoneSelect.addEventListener('change', updateEstimate);
+  planSelect.addEventListener('change', updateEstimate);
+  updateEstimate();
 }

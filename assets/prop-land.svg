@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 280" width="100%" height="100%">
+  <defs>
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E0F2FE"/>
+      <stop offset="100%" stop-color="#FFF8F0"/>
+    </linearGradient>
+    <linearGradient id="landGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FEF08A"/>
+      <stop offset="100%" stop-color="#EAB308"/>
+    </linearGradient>
+    <linearGradient id="navyGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1B3A5F"/>
+      <stop offset="100%" stop-color="#0F233B"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="500" height="280" rx="12" fill="url(#skyGrad)"/>
+  
+  <!-- Boundary Wire Fence & Posts -->
+  <path d="M 40,240 L 460,240" stroke="#1B3A5F" stroke-width="4" opacity="0.15"/>
+  
+  <!-- Plot Field Surface -->
+  <path d="M 30,220 Q 250,180 470,220 L 470,260 L 30,260 Z" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+
+  <!-- Fence Posts -->
+  <rect x="70" y="140" width="12" height="90" rx="3" fill="#64748B"/>
+  <rect x="180" y="130" width="12" height="100" rx="3" fill="#64748B"/>
+  <rect x="290" y="125" width="12" height="105" rx="3" fill="#64748B"/>
+  <rect x="400" y="135" width="12" height="95" rx="3" fill="#64748B"/>
+
+  <!-- Fence Wires -->
+  <line x1="70" y1="155" x2="400" y2="150" stroke="#94A3B8" stroke-width="2" stroke-dasharray="4,2"/>
+  <line x1="70" y1="180" x2="400" y2="175" stroke="#94A3B8" stroke-width="2" stroke-dasharray="4,2"/>
+  <line x1="70" y1="205" x2="400" y2="200" stroke="#94A3B8" stroke-width="2" stroke-dasharray="4,2"/>
+
+  <!-- Boundary Pillar Corner Marker (Stone) -->
+  <rect x="235" y="110" width="30" height="70" rx="4" fill="#C9A227" stroke="#1B3A5F" stroke-width="2"/>
+  <text x="250" y="150" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1B3A5F" text-anchor="middle">GPS</text>
+
+  <!-- Live Geotag Badge Overlay -->
+  <g transform="translate(30, 30)">
+    <rect width="180" height="38" rx="19" fill="#1B3A5F" opacity="0.95"/>
+    <circle cx="22" cy="19" r="6" fill="#10B981"/>
+    <text x="36" y="24" font-family="sans-serif" font-size="12" font-weight="bold" fill="#FFFFFF">Vacant Site Inspection</text>
+  </g>
+  
+  <g transform="translate(320, 30)">
+    <rect width="150" height="38" rx="19" fill="#FFFFFF" stroke="#C9A227" stroke-width="1.5"/>
+    <text x="75" y="24" font-family="sans-serif" font-size="11" font-weight="bold" fill="#C9A227" text-anchor="middle">📍 12.9716° N, 77.5946° E</text>
+  </g>
+</svg>

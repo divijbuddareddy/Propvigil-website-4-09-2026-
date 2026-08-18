@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 360" width="100%" height="100%">
+  <defs>
+    <linearGradient id="cardBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#FFF8F0"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#1B3A5F" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <rect width="600" height="360" rx="16" fill="url(#cardBg)" stroke="#C9A227" stroke-width="2" filter="url(#shadow)"/>
+
+  <!-- Top Header Bar -->
+  <rect x="0" y="0" width="600" height="60" rx="16" fill="#1B3A5F"/>
+  <rect x="0" y="44" width="600" height="16" fill="#1B3A5F"/>
+  
+  <text x="30" y="38" font-family="'Outfit', sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">PROPVIGIL INSPECTION REPORT</text>
+  <rect x="420" y="16" width="150" height="28" rx="14" fill="#C9A227"/>
+  <text x="495" y="35" font-family="sans-serif" font-size="11" font-weight="bold" fill="#1B3A5F" text-anchor="middle">OFFICIAL AUDIT</text>
+
+  <!-- Photo Grid Mockup -->
+  <!-- Photo 1: Fixed Corner 1 -->
+  <g transform="translate(30, 80)">
+    <rect width="255" height="150" rx="8" fill="#E2E8F0" stroke="#CBD5E1"/>
+    <path d="M 0,160 L 255,160 L 255,110 Q 120,70 0,120 Z" fill="#CBD5E1"/>
+    <!-- Stamp -->
+    <rect x="10" y="10" width="160" height="26" rx="4" fill="rgba(15, 23, 42, 0.85)"/>
+    <text x="20" y="27" font-family="monospace" font-size="10" fill="#C9A227">12.9716°N 77.5946°E</text>
+    <rect x="10" y="114" width="140" height="24" rx="4" fill="rgba(16, 185, 129, 0.9)"/>
+    <text x="20" y="130" font-family="sans-serif" font-size="10" font-weight="bold" fill="#FFFFFF">✓ BOUNDARY CLEAR</text>
+  </g>
+
+  <!-- Photo 2: Fixed Corner 2 -->
+  <g transform="translate(315, 80)">
+    <rect width="255" height="150" rx="8" fill="#FEF3C7" stroke="#F59E0B"/>
+    <!-- Stamp -->
+    <rect x="10" y="10" width="160" height="26" rx="4" fill="rgba(15, 23, 42, 0.85)"/>
+    <text x="20" y="27" font-family="monospace" font-size="10" fill="#C9A227">18 AUG 2026 10:45AM</text>
+    <rect x="10" y="114" width="160" height="24" rx="4" fill="rgba(16, 185, 129, 0.9)"/>
+    <text x="20" y="130" font-family="sans-serif" font-size="10" font-weight="bold" fill="#FFFFFF">✓ FENCE INTACT</text>
+  </g>
+
+  <!-- Inspection Checklist Summary Strip -->
+  <rect x="30" y="250" width="540" height="80" rx="8" fill="#FFF8F0" stroke="#CBD5E1"/>
+  
+  <text x="50" y="278" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1B3A5F">SITE STATUS CHECKLIST</text>
+  
+  <circle cx="55" cy="304" r="6" fill="#10B981"/>
+  <text x="68" y="308" font-family="sans-serif" font-size="11" fill="#1E293B">No encroachment</text>
+  
+  <circle cx="210" cy="304" r="6" fill="#10B981"/>
+  <text x="223" y="308" font-family="sans-serif" font-size="11" fill="#1E293B">Zero waste dumping</text>
+  
+  <circle cx="370" cy="304" r="6" fill="#10B981"/>
+  <text x="383" y="308" font-family="sans-serif" font-size="11" fill="#1E293B">No municipal notice</text>
+</svg>
