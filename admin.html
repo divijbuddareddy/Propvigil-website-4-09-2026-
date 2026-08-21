@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PropVigil Admin CMS — Civic Updates Manager</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Fonts & Styles -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  
+  <style>
+    :root {
+      --admin-navy: #0F172A;
+      --admin-gold: #D4AF37;
+      --admin-bg: #090D16;
+      --admin-card: rgba(15, 23, 42, 0.85);
+    }
+    
+    body.admin-body {
+      background: var(--admin-bg);
+      color: #E2E8F0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+    }
+
+    .admin-header {
+      background: rgba(15, 23, 42, 0.95);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+      backdrop-filter: blur(12px);
+      padding: 16px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .admin-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .admin-badge {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.05));
+      border: 1px solid var(--admin-gold);
+      color: var(--admin-gold);
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .login-container {
+      max-width: 440px;
+      margin: 80px auto;
+      background: var(--admin-card);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      backdrop-filter: blur(16px);
+    }
+
+    .admin-card {
+      background: var(--admin-card);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      margin-bottom: 30px;
+      backdrop-filter: blur(12px);
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      color: #E2E8F0;
+    }
+
+    .admin-table th {
+      background: rgba(30, 41, 59, 0.8);
+      color: var(--admin-gold);
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+    }
+
+    .admin-table td {
+      padding: 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.92rem;
+      vertical-align: middle;
+    }
+
+    .admin-table tr:hover td {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .badge-status {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .badge-status.published { background: rgba(16, 185, 129, 0.2); color: #10B981; border: 1px solid #10B981; }
+    .badge-status.draft { background: rgba(245, 158, 11, 0.2); color: #F59E0B; border: 1px solid #F59E0B; }
+
+    /* Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-content {
+      background: #0F172A;
+      border: 1px solid var(--admin-gold);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 36px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.8);
+    }
+
+    .btn-admin-primary {
+      background: linear-gradient(135deg, #D4AF37, #B38F24);
+      color: #0F172A;
+      font-weight: 700;
+      padding: 12px 24px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-admin-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+    }
+
+    .btn-admin-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #E2E8F0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+    }
+    .btn-admin-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-admin-danger {
+      background: rgba(239, 68, 68, 0.2);
+      color: #EF4444;
+      border: 1px solid #EF4444;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .btn-admin-danger:hover {
+      background: #EF4444;
+      color: white;
+    }
+
+    .form-label-dark {
+      color: #CBD5E1;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .form-input-dark {
+      width: 100%;
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: white;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border 0.2s ease;
+    }
+    .form-input-dark:focus {
+      border-color: var(--admin-gold);
+    }
+
+    .switch-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body class="admin-body">
+
+  <!-- Admin Header -->
+  <header class="admin-header">
+    <div class="container admin-nav">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <a href="index.html">
+          <img src="assets/logo-white.svg" alt="PropVigil Logo" style="height: 40px;">
+        </a>
+        <span class="admin-badge">Civic Updates CMS</span>
+      </div>
+      
+      <div id="auth-header-controls" style="display: none; align-items: center; gap: 16px;">
+        <span style="font-size: 0.9rem; color: #94A3B8;">Logged in as: <strong style="color: var(--admin-gold);" id="logged-user-name">Admin</strong></span>
+        <a href="civic-updates.html" target="_blank" class="btn-admin-secondary">👁 View Live Page</a>
+        <button onclick="logoutAdmin()" class="btn-admin-secondary" style="border-color: #EF4444; color: #EF4444;">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Login Section -->
+  <div id="login-section" class="container">
+    <div class="login-container">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <h2 style="font-size: 1.8rem; color: white; margin-bottom: 8px;">Admin Portal Login</h2>
+        <p style="font-size: 0.9rem; color: #94A3B8;">Enter your credentials to manage Bengaluru Civic Notices</p>
+      </div>
+
+      <form id="admin-login-form">
+        <div style="margin-bottom: 18px;">
+          <label class="form-label-dark">Username</label>
+          <input type="text" id="admin-user" class="form-input-dark" value="admin" required>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <label class="form-label-dark">Password</label>
+          <input type="password" id="admin-pass" class="form-input-dark" placeholder="••••••••" required>
+        </div>
+
+        <div id="login-error" style="color: #EF4444; font-size: 0.85rem; margin-bottom: 16px; display: none;"></div>
+
+        <button type="submit" class="btn-admin-primary" style="width: 100%; justify-content: center; padding: 14px;">
+          <span>Sign In to CMS</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dashboard Section -->
+  <div id="dashboard-section" class="container" style="display: none; padding-top: 40px; padding-bottom: 60px;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+      <div>
+        <h1 style="font-size: 2.2rem; color: white; margin-bottom: 6px;">Civic & Compliance Notices</h1>
+        <p style="color: #94A3B8; font-size: 0.95rem;">Add, edit, publish, and manage property compliance updates for Bengaluru site owners.</p>
+      </div>
+      
+      <button onclick="openNoticeModal()" class="btn-admin-primary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>Add New Civic Notice</span>
+      </button>
+    </div>
+
+    <!-- Notices Data Table -->
+    <div class="admin-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="font-size: 1.2rem; color: var(--admin-gold);">Manage Notices</h3>
+        <input type="text" id="admin-search-input" placeholder="Search notices by title, ref..." class="form-input-dark" style="width: 280px; padding: 8px 12px; font-size: 0.85rem;">
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Entry / Title</th>
+              <th>Reference No</th>
+              <th>Issued Date</th>
+              <th>Original PDF</th>
+              <th style="text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="notices-table-body">
+            <!-- Loaded dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add / Edit Notice Modal -->
+  <div id="notice-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px;">
+        <h2 id="modal-title" style="font-size: 1.5rem; color: var(--admin-gold);">Add New Civic Notice</h2>
+        <button onclick="closeNoticeModal()" style="background: none; border: none; color: #94A3B8; font-size: 1.5rem; cursor: pointer;">&times;</button>
+      </div>
+
+      <form id="notice-form">
+        <input type="hidden" id="form-notice-id">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+          <div>
+            <label class="form-label-dark">Entry Label *</label>
+            <input type="text" id="form-entry-label" class="form-control form-input-dark" placeholder="e.g. ENTRY 2 — GBA FENCING MANDATE" required>
+          </div>
+          <div>
+            <label class="form-label-dark">Custom URL Slug *</label>
+            <input type="text" id="form-slug" class="form-control form-input-dark" placeholder="e.g. gba-vacant-site-clearing-2026" required>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label class="form-label-dark">Notice Headline / Title *</label>
+          <input type="text" id="form-title" class="form-control form-input-dark" placeholder="e.g. Greater Bengaluru Authority — vacant site owners directed..." required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+          <div>
+            <label class="form-label-dark">Issued Date *</label>
+            <input type="text" id="form-issued-date" class="form-control form-input-dark" placeholder="e.g. 10 August 2026" required>
+          </div>
+          <div>
+            <label class="form-label-dark">Reference Number *</label>
+            <input type="text" id="form-ref-number" class="form-control form-input-dark" placeholder="e.g. CC/PS/PR/240/2026-27" required>
+          </div>
+          <div>
+            <label class="form-label-dark">Status Badge Type</label>
+            <select id="form-status-type" class="form-control form-input-dark">
+              <option value="danger">Danger (Red - Deadline Passed)</option>
+              <option value="warning">Warning (Amber - Active Mandate)</option>
+              <option value="success">Success (Green - Compliant)</option>
+              <option value="info">Info (Blue - General Notice)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label class="form-label-dark">Status Summary Text *</label>
+          <input type="text" id="form-status" class="form-control form-input-dark" placeholder="e.g. Status: deadline passed 15 August 2026" required>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label class="form-label-dark">WHAT WAS ISSUED *</label>
+          <textarea id="form-what" class="form-control form-input-dark" rows="3" placeholder="Details of what was announced..." required></textarea>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label class="form-label-dark">THE RULE BEHIND IT *</label>
+          <textarea id="form-rule" class="form-control form-input-dark" rows="2" placeholder="e.g. Bye-law 18(1)(b) of the Solid Waste Management Bye-laws 2020..." required></textarea>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label class="form-label-dark">PENALTIES & CONSEQUENCES *</label>
+          <textarea id="form-consequences" class="form-control form-input-dark" rows="3" placeholder="What happens if ignored..." required></textarea>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <label class="form-label-dark">Upload Original Notice PDF Document</label>
+          <input type="file" id="form-pdf-file" accept="application/pdf" class="form-input-dark" style="padding: 8px;">
+          <small style="color: #94A3B8; display: block; margin-top: 4px;">Select a PDF file to attach directly to this civic update entry.</small>
+        </div>
+
+        <div style="margin-bottom: 24px; background: rgba(30,41,59,0.5); padding: 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+          <label class="switch-label">
+            <input type="checkbox" id="form-is-published" style="width: 20px; height: 20px; accent-color: var(--admin-gold);" checked>
+            <span>Publish immediately (visible to website visitors)</span>
+          </label>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 12px;">
+          <button type="button" onclick="closeNoticeModal()" class="btn-admin-secondary">Cancel</button>
+          <button type="submit" class="btn-admin-primary">Save Civic Notice</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script style="display: none;">
+    // Admin State & Logic
+    let currentAuthToken = localStorage.getItem('propvigil_admin_token') || '';
+    let noticesList = [];
+
+    function getApiUrl(path) {
+      if (window.location.protocol === 'file:' || window.location.port !== '3000') {
+        return 'http://localhost:3000' + path;
+      }
+      return path;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (currentAuthToken) {
+        verifyAdminSession();
+      } else {
+        showLoginView();
+      }
+
+      document.getElementById('admin-login-form').addEventListener('submit', handleLogin);
+      document.getElementById('notice-form').addEventListener('submit', handleSaveNotice);
+      document.getElementById('admin-search-input').addEventListener('input', filterAdminNotices);
+
+      // Auto-slug generator
+      document.getElementById('form-title').addEventListener('input', (e) => {
+        const slugInput = document.getElementById('form-slug');
+        if (!document.getElementById('form-notice-id').value) {
+          slugInput.value = e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+        }
+      });
+    });
+
+    function showLoginView() {
+      document.getElementById('login-section').style.display = 'block';
+      document.getElementById('dashboard-section').style.display = 'none';
+      document.getElementById('auth-header-controls').style.display = 'none';
+    }
+
+    function showDashboardView(username) {
+      document.getElementById('login-section').style.display = 'none';
+      document.getElementById('dashboard-section').style.display = 'block';
+      document.getElementById('auth-header-controls').style.display = 'flex';
+      if (username) document.getElementById('logged-user-name').textContent = username;
+      fetchAdminNotices();
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById('admin-user').value;
+      const pass = document.getElementById('admin-pass').value;
+      const errDiv = document.getElementById('login-error');
+
+      try {
+        const res = await fetch(getApiUrl('/api/admin/login'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: user, password: pass })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          currentAuthToken = data.token;
+          localStorage.setItem('propvigil_admin_token', currentAuthToken);
+          showDashboardView(user);
+        } else {
+          errDiv.textContent = data.message || 'Login failed';
+          errDiv.style.display = 'block';
+        }
+      } catch (err) {
+        errDiv.textContent = 'Server error. Make sure server.ps1 is running on port 3000.';
+        errDiv.style.display = 'block';
+      }
+    }
+
+    async function verifyAdminSession() {
+      try {
+        const res = await fetch(getApiUrl('/api/admin/me'), {
+          headers: { 'Authorization': `Bearer ${currentAuthToken}` }
+        });
+        const data = await res.json();
+        if (data.success) {
+          showDashboardView(data.user.username);
+        } else {
+          logoutAdmin();
+        }
+      } catch (err) {
+        showDashboardView('Admin');
+      }
+    }
+
+    function logoutAdmin() {
+      localStorage.removeItem('propvigil_admin_token');
+      currentAuthToken = '';
+      showLoginView();
+    }
+
+    async function fetchAdminNotices() {
+      try {
+        const res = await fetch(getApiUrl('/api/admin/civic-updates'), {
+          headers: { 'Authorization': `Bearer ${currentAuthToken}` }
+        });
+        const data = await res.json();
+        if (data.success) {
+          noticesList = data.notices;
+          renderAdminTable(noticesList);
+        }
+      } catch (err) {
+        console.error('Failed to load admin notices', err);
+      }
+    }
+
+    function renderAdminTable(notices) {
+      const tbody = document.getElementById('notices-table-body');
+      if (!notices || notices.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #94A3B8;">No notices found. Click "Add New Civic Notice" above to create one.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = notices.map(item => `
+        <tr>
+          <td>
+            <span class="badge-status ${item.is_published ? 'published' : 'draft'}">
+              ${item.is_published ? 'Published' : 'Draft'}
+            </span>
+          </td>
+          <td>
+            <strong style="color: white; display: block; margin-bottom: 2px;">${item.title}</strong>
+            <span style="font-size: 0.78rem; color: var(--admin-gold);">${item.entry_label || ''} · slug: ${item.slug}</span>
+          </td>
+          <td>${item.ref_number || 'N/A'}</td>
+          <td>${item.issued_date || 'N/A'}</td>
+          <td>
+            <a href="${item.pdf_url}" target="_blank" class="btn-admin-secondary" style="padding: 4px 10px; font-size: 0.75rem;">
+              📄 ${item.pdf_filename || 'PDF'}
+            </a>
+          </td>
+          <td style="text-align: right; white-space: nowrap;">
+            <button onclick="togglePublish('${item.id}', ${!item.is_published})" class="btn-admin-secondary" style="margin-right: 6px;">
+              ${item.is_published ? 'Unpublish' : 'Publish'}
+            </button>
+            <button onclick="openNoticeModal('${item.id}')" class="btn-admin-secondary" style="margin-right: 6px; border-color: var(--admin-gold); color: var(--admin-gold);">
+              Edit
+            </button>
+            <button onclick="deleteNotice('${item.id}')" class="btn-admin-danger">
+              Delete
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function filterAdminNotices() {
+      const q = document.getElementById('admin-search-input').value.toLowerCase();
+      const filtered = noticesList.filter(n => 
+        n.title.toLowerCase().includes(q) || 
+        (n.ref_number && n.ref_number.toLowerCase().includes(q))
+      );
+      renderAdminTable(filtered);
+    }
+
+    function openNoticeModal(id = null) {
+      const modal = document.getElementById('notice-modal');
+      const form = document.getElementById('notice-form');
+      form.reset();
+
+      if (id) {
+        document.getElementById('modal-title').textContent = 'Edit Civic Notice';
+        const notice = noticesList.find(n => n.id === id);
+        if (notice) {
+          document.getElementById('form-notice-id').value = notice.id;
+          document.getElementById('form-entry-label').value = notice.entry_label || '';
+          document.getElementById('form-slug').value = notice.slug || '';
+          document.getElementById('form-title').value = notice.title || '';
+          document.getElementById('form-issued-date').value = notice.issued_date || '';
+          document.getElementById('form-ref-number').value = notice.ref_number || '';
+          document.getElementById('form-status-type').value = notice.status_type || 'warning';
+          document.getElementById('form-status').value = notice.status || '';
+          document.getElementById('form-what').value = notice.what_was_issued || '';
+          document.getElementById('form-rule').value = notice.rule_behind_it || '';
+          document.getElementById('form-consequences').value = notice.consequences || '';
+          document.getElementById('form-is-published').checked = !!notice.is_published;
+        }
+      } else {
+        document.getElementById('modal-title').textContent = 'Add New Civic Notice';
+        document.getElementById('form-notice-id').value = '';
+        document.getElementById('form-is-published').checked = true;
+      }
+
+      modal.classList.add('active');
+    }
+
+    function closeNoticeModal() {
+      document.getElementById('notice-modal').classList.remove('active');
+    }
+
+    async function handleSaveNotice(e) {
+      e.preventDefault();
+      const id = document.getElementById('form-notice-id').value;
+      const fileInput = document.getElementById('form-pdf-file');
+
+      let pdfData = null;
+      let pdfName = null;
+
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        pdfName = file.name;
+        pdfData = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result.split(',')[1]);
+          reader.readAsDataURL(file);
+        });
+      }
+
+      const payload = {
+        id: id || undefined,
+        entry_label: document.getElementById('form-entry-label').value,
+        slug: document.getElementById('form-slug').value,
+        title: document.getElementById('form-title').value,
+        issued_date: document.getElementById('form-issued-date').value,
+        ref_number: document.getElementById('form-ref-number').value,
+        status_type: document.getElementById('form-status-type').value,
+        status: document.getElementById('form-status').value,
+        what_was_issued: document.getElementById('form-what').value,
+        rule_behind_it: document.getElementById('form-rule').value,
+        consequences: document.getElementById('form-consequences').value,
+        is_published: document.getElementById('form-is-published').checked,
+        pdf_data: pdfData,
+        pdf_name: pdfName
+      };
+
+      const url = getApiUrl('/api/admin/civic-updates');
+      const method = id ? 'PUT' : 'POST';
+
+      try {
+        const res = await fetch(url, {
+          method: method,
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentAuthToken}`
+          },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeNoticeModal();
+          fetchAdminNotices();
+        } else {
+          alert(data.message || 'Error saving notice');
+        }
+      } catch (err) {
+        alert('Server error saving notice');
+      }
+    }
+
+    async function togglePublish(id, isPublished) {
+      try {
+        const res = await fetch(getApiUrl('/api/admin/civic-updates/publish'), {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentAuthToken}`
+          },
+          body: JSON.stringify({ id, is_published: isPublished })
+        });
+        const data = await res.json();
+        if (data.success) fetchAdminNotices();
+      } catch (err) {
+        console.error('Error toggling publish', err);
+      }
+    }
+
+    async function deleteNotice(id) {
+      if (!confirm('Are you sure you want to delete this civic update notice?')) return;
+      try {
+        const res = await fetch(getApiUrl('/api/admin/civic-updates'), {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentAuthToken}`
+          },
+          body: JSON.stringify({ id })
+        });
+        const data = await res.json();
+        if (data.success) fetchAdminNotices();
+      } catch (err) {
+        console.error('Error deleting notice', err);
+      }
+    }
+  </script>
+</body>
+</html>
