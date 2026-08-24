@@ -160,64 +160,6 @@
     </div>
   </div>
 
-  <!-- Interactive Property Inspection Estimator Section -->
-  <section class="section-padding" style="background: var(--bg-light); border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
-    <div class="container">
-      <div class="section-header reveal-on-scroll">
-        <h2 class="section-title">Instant Inspection Fee Calculator</h2>
-        <p class="section-intro">Calculate your exact inspection price in two clicks. No hidden charges.</p>
-      </div>
-
-      <div class="estimator-widget-card reveal-on-scroll">
-        <div class="estimator-grid">
-          <div class="estimator-fields">
-            <div class="est-field-group">
-              <label for="est-proptype">Select Property Category</label>
-              <select id="est-proptype" class="est-select">
-                <option value="site">Vacant Site / Plot / Land</option>
-                <option value="unoccupied">Unoccupied / Locked Flat</option>
-                <option value="rented">Rented Flat (Tenant Managed)</option>
-                <option value="construction">Under Construction Unit</option>
-              </select>
-            </div>
-
-            <div class="est-field-group">
-              <label for="est-zone">Property Location Zone</label>
-              <select id="est-zone" class="est-select">
-                <option value="city">Bengaluru City Limits (Sarjapur, Whitefield, Indiranagar, etc.)</option>
-                <option value="outskirts">Bengaluru Outskirts / Suburban Belt (Devanahalli, Nelamangala, etc.)</option>
-              </select>
-            </div>
-
-            <div class="est-field-group">
-              <label for="est-plan">Inspection Frequency &amp; Plan</label>
-              <select id="est-plan" class="est-select">
-                <option value="first_visit">Single First Visit (₹2,500 / ₹3,500 credit back)</option>
-                <option value="quarterly" selected>Quarterly Plan (4 Inspections / Year)</option>
-                <option value="monthly">Monthly Plan (12 Inspections / Year)</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="estimator-result-panel">
-            <span style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: var(--brand-gold); letter-spacing: 1px;">ESTIMATED INSPECTION FEE</span>
-            <div id="est-price-val" class="est-price-display">₹16,000 / yr</div>
-            <p id="est-subtitle" class="est-price-subtitle">4 inspections / year. Includes geotagged PDF report &amp; WhatsApp video update on every visit.</p>
-            
-            <ul class="est-feature-list">
-              <li>100% Geotagged &amp; Timestamped GPS Metadata</li>
-              <li>Fixed Camera Angles &amp; Boundary Check</li>
-              <li>First Visit Fee Credited 100% On Annual Plan</li>
-            </ul>
-
-            <a id="est-book-btn" href="https://wa.me/919242143775" target="_blank" class="btn btn-whatsapp" style="padding: 14px 28px; width: 100%; justify-content: center;">
-              <span>Confirm &amp; Book via WhatsApp</span>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- Section 2: What do you own? Expandable Accordion Blocks -->
   <section id="what-we-do" class="section-padding">
@@ -232,23 +174,18 @@
         <!-- Tab Navigation Bar -->
         <div class="prop-tab-nav">
           <button class="prop-tab-btn active" data-tab="panel-land">
-            <span class="tab-icon">🏞️</span>
             <span>Vacant land or site</span>
           </button>
           <button class="prop-tab-btn" data-tab="panel-flat">
-            <span class="tab-icon">🔑</span>
             <span>Locked / unoccupied flat</span>
           </button>
           <button class="prop-tab-btn" data-tab="panel-rented">
-            <span class="tab-icon">🏢</span>
             <span>Rented flat</span>
           </button>
           <button class="prop-tab-btn" data-tab="panel-inherited">
-            <span class="tab-icon">📜</span>
             <span>Inherited property</span>
           </button>
           <button class="prop-tab-btn" data-tab="panel-construction">
-            <span class="tab-icon">🏗️</span>
             <span>Under construction</span>
           </button>
         </div>
@@ -257,13 +194,13 @@
         <div id="panel-land" class="prop-tab-panel active">
           <div class="prop-details-grid">
             <div class="prop-info-card warning-card">
-              <span class="card-header-badge red">⚠️ WHAT GOES WRONG WHEN NOBODY VISITS</span>
+              <span class="card-header-badge red">WHAT GOES WRONG WHEN NOBODY VISITS</span>
               <h4>Dumping, Encroachment &amp; Notice Risks</h4>
               <p>Waste and debris get dumped. Boundary stones go missing. A neighbour's compound wall moves. Someone parks, stores material, or builds a shed. A municipal notice is issued and nobody tells you. Years pass and the site is no longer quite the shape it was.</p>
             </div>
 
             <div class="prop-info-card checklist-card">
-              <span class="card-header-badge gold">🔍 WHAT WE CHECK ON EVERY VISIT</span>
+              <span class="card-header-badge gold">WHAT WE CHECK ON EVERY VISIT</span>
               <h4>6-Point Physical Boundary Audit</h4>
               <ul class="check-list-grid">
                 <li>Boundary markers and stones — present, moved, missing</li>
@@ -277,7 +214,7 @@
             </div>
 
             <div class="prop-info-card execution-card">
-              <span class="card-header-badge green">🛠️ WHAT YOU GET &amp; HOW WE EXECUTE THE WORK</span>
+              <span class="card-header-badge green">WHAT YOU GET &amp; HOW WE EXECUTE THE WORK</span>
               <h4>Geotagged Report &amp; Direct Maintenance Execution</h4>
               <p>You get a dated report with geotagged photographs from fixed camera angles. If something needs doing — waste/debris clearing, weed removal, fencing/gate repairs, boundary marker replacement, or municipal notice resolution — we quote for it separately with zero markup surprises. Nothing happens without your written approval.</p>
             </div>
@@ -288,13 +225,13 @@
         <div id="panel-flat" class="prop-tab-panel">
           <div class="prop-details-grid">
             <div class="prop-info-card warning-card">
-              <span class="card-header-badge red">⚠️ WHAT GOES WRONG WHEN NOBODY VISITS</span>
+              <span class="card-header-badge red">WHAT GOES WRONG WHEN NOBODY VISITS</span>
               <h4>Damp, Leakage &amp; Silent Deterioration</h4>
               <p>An empty flat deteriorates faster than empty land. Damp spreads behind furniture. A slow leak from the flat above goes unnoticed for a year. Seals perish, taps seize, drains dry out and let smells in. Pests settle. Society dues accumulate quietly until there is a notice on the door.</p>
             </div>
 
             <div class="prop-info-card checklist-card">
-              <span class="card-header-badge gold">🔍 WHAT WE CHECK ON EVERY VISIT</span>
+              <span class="card-header-badge gold">WHAT WE CHECK ON EVERY VISIT</span>
               <h4>Full Apartment Health Check</h4>
               <ul class="check-list-grid">
                 <li>Ceilings, walls and skirting for damp, seepage and cracks</li>
@@ -308,7 +245,7 @@
             </div>
 
             <div class="prop-info-card execution-card">
-              <span class="card-header-badge green">🛠️ WHAT YOU GET &amp; HOW WE EXECUTE THE WORK</span>
+              <span class="card-header-badge green">WHAT YOU GET &amp; HOW WE EXECUTE THE WORK</span>
               <h4>Room-by-Room Report &amp; Maintenance Execution</h4>
               <p>Room-by-room photographs and recorded meter readings. We handle damp/seepage repairs, plumbing, electrical fixes, pest control, deep cleaning before move-in, and society dues payments. Each job is quoted and approved in writing first.</p>
             </div>
@@ -319,13 +256,13 @@
         <div id="panel-rented" class="prop-tab-panel">
           <div class="prop-details-grid">
             <div class="prop-info-card warning-card">
-              <span class="card-header-badge red">⚠️ WHAT GOES WRONG WHEN NOBODY VISITS</span>
+              <span class="card-header-badge red">WHAT GOES WRONG WHEN NOBODY VISITS</span>
               <h4>Late Rent, Subletting &amp; Handover Disputes</h4>
               <p>Rent arrives late, then later, then with explanations. The flat is sublet without your knowledge. Damage accumulates and is only discovered at handover, by which time the deposit argument is already lost. Society compliance lapses in your name.</p>
             </div>
 
             <div class="prop-info-card checklist-card">
-              <span class="card-header-badge gold">🔍 WHAT WE CHECK ON EVERY VISIT</span>
+              <span class="card-header-badge gold">WHAT WE CHECK ON EVERY VISIT</span>
               <h4>Tenant &amp; Compliance Audit</h4>
               <ul class="check-list-grid">
                 <li>Rent received, verified against agreed date</li>
@@ -338,7 +275,7 @@
             </div>
 
             <div class="prop-info-card execution-card">
-              <span class="card-header-badge green">🛠️ WHAT YOU GET &amp; HOW WE EXECUTE THE WORK</span>
+              <span class="card-header-badge green">WHAT YOU GET &amp; HOW WE EXECUTE THE WORK</span>
               <h4>Condition Reports &amp; Handover Coordination</h4>
               <p>Move-in and move-out condition reports with photographs so deposit arguments are settled on clear evidence. We follow up on late rent, coordinate repairs, and handle tenant handovers. <em>Note: We do not collect your rent; rent is paid by tenant directly to your bank account.</em></p>
             </div>
@@ -349,19 +286,19 @@
         <div id="panel-inherited" class="prop-tab-panel">
           <div class="prop-details-grid">
             <div class="prop-info-card warning-card">
-              <span class="card-header-badge red">⚠️ WHAT GOES WRONG WHEN NOBODY VISITS</span>
+              <span class="card-header-badge red">WHAT GOES WRONG WHEN NOBODY VISITS</span>
               <h4>Unclear Boundaries &amp; Unauthorized Possession</h4>
               <p>Often the owner does not know precisely what they own. Boundaries are described by landmarks that no longer exist. A relative or long-standing occupant is in possession. Records are incomplete. Nothing is urgent until it suddenly is.</p>
             </div>
 
             <div class="prop-info-card checklist-card">
-              <span class="card-header-badge gold">🔍 WHAT WE DO ON OUR FIRST VISIT</span>
+              <span class="card-header-badge gold">WHAT WE DO ON OUR FIRST VISIT</span>
               <h4>One-Time Property Ground Survey</h4>
               <p>We locate the property, photograph it, record its present condition and who is in occupation, and give you a written account of what is actually there. What you do next is your decision — and if it needs a lawyer, we will say so plainly.</p>
             </div>
 
             <div class="prop-info-card execution-card">
-              <span class="card-header-badge green">🛠️ WHAT YOU GET &amp; HOW WE EXECUTE THE WORK</span>
+              <span class="card-header-badge green">WHAT YOU GET &amp; HOW WE EXECUTE THE WORK</span>
               <h4>Site Clearing, Boundary Fencing &amp; Regular Oversight</h4>
               <p>Clearing years of accumulated waste and overgrowth, re-establishing unclear boundaries on the ground, securing the plot with fencing and signage, followed by regular scheduled visits so the property does not drift again.</p>
             </div>
@@ -372,19 +309,19 @@
         <div id="panel-construction" class="prop-tab-panel">
           <div class="prop-details-grid">
             <div class="prop-info-card warning-card">
-              <span class="card-header-badge red">⚠️ WHAT GOES WRONG WHEN NOBODY VISITS</span>
+              <span class="card-header-badge red">WHAT GOES WRONG WHEN NOBODY VISITS</span>
               <h4>Unfiltered Progress Updates &amp; Handover Snags</h4>
               <p>Progress updates come from the party with an interest in progress sounding good. Delays are described as minor until possession is a year late.</p>
             </div>
 
             <div class="prop-info-card checklist-card">
-              <span class="card-header-badge gold">🔍 WHAT WE DO ON EVERY VISIT</span>
+              <span class="card-header-badge gold">WHAT WE DO ON EVERY VISIT</span>
               <h4>Independent Project Construction Audit</h4>
               <p>Scheduled visits to your unit and the project, photographed and dated. Construction stage recorded. Independent snagging observations compiled at handover stage so you get an account that is not the builder's account.</p>
             </div>
 
             <div class="prop-info-card execution-card">
-              <span class="card-header-badge green">🛠️ WHAT YOU GET &amp; HOW WE EXECUTE THE WORK</span>
+              <span class="card-header-badge green">WHAT YOU GET &amp; HOW WE EXECUTE THE WORK</span>
               <h4>Builder Follow-up &amp; Snagging Inspection</h4>
               <p>We follow up with the builder's site office on your behalf, record the snag list with photographs at handover, and take over regular property care once you take possession.</p>
             </div>
@@ -424,6 +361,75 @@
           <div class="step-number">4</div>
           <h3>You decide what happens next</h3>
           <p>If something needs doing — clearing, fencing, signage, a repair — we quote for it separately. Nothing is done, and nothing is spent, without your approval in writing.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Property Inspection Estimator Section -->
+  <section class="section-padding" style="background: var(--bg-light); border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
+    <div class="container">
+      <div class="section-header reveal-on-scroll">
+        <h2 class="section-title">Instant Inspection Fee Calculator</h2>
+        <p class="section-intro">Calculate your exact inspection price in two clicks. No hidden charges.</p>
+      </div>
+
+      <div class="estimator-widget-card reveal-on-scroll">
+        <div class="estimator-grid">
+          <div class="estimator-fields">
+            <div class="est-field-group">
+              <label for="est-proptype">Select Property Category</label>
+              <select id="est-proptype" class="est-select">
+                <option value="site">Vacant Site / Plot / Land</option>
+                <option value="unoccupied">Unoccupied / Locked Flat</option>
+                <option value="rented">Rented Flat (Tenant Managed)</option>
+                <option value="construction">Under Construction Unit</option>
+              </select>
+            </div>
+
+            <div class="est-field-group">
+              <label for="est-size" id="est-size-label">Plot / Site Dimensions</label>
+              <select id="est-size" class="est-select">
+                <option value="small">Up to 30x40 (&lt; 1,200 sq ft)</option>
+                <option value="medium" selected>30x40 to 40x60 (1,200 - 2,400 sq ft)</option>
+                <option value="large">40x60 to 50x80 (2,400 - 4,000 sq ft)</option>
+                <option value="xlarge">50x80+ / Large Site (&gt; 4,000 sq ft)</option>
+              </select>
+            </div>
+
+            <div class="est-field-group">
+              <label for="est-zone">Property Location Zone</label>
+              <select id="est-zone" class="est-select">
+                <option value="city">Bengaluru City Limits (Sarjapur, Whitefield, Indiranagar, etc.)</option>
+                <option value="outskirts">Bengaluru Outskirts / Suburban Belt (Devanahalli, Nelamangala, etc.)</option>
+              </select>
+            </div>
+
+            <div class="est-field-group">
+              <label for="est-plan">Inspection Frequency &amp; Plan</label>
+              <select id="est-plan" class="est-select">
+                <option value="first_visit">Single First Visit (₹2,500 / ₹3,500 credit back)</option>
+                <option value="quarterly" selected>Quarterly Plan (4 Inspections / Year)</option>
+                <option value="monthly">Monthly Plan (12 Inspections / Year)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="estimator-result-panel">
+            <span style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: var(--brand-gold); letter-spacing: 1px;">ESTIMATED INSPECTION FEE</span>
+            <div id="est-price-val" class="est-price-display">₹16,000 / yr</div>
+            <p id="est-subtitle" class="est-price-subtitle">4 inspections / year. Includes geotagged PDF report &amp; WhatsApp video update on every visit.</p>
+            
+            <ul class="est-feature-list">
+              <li>100% Geotagged &amp; Timestamped GPS Metadata</li>
+              <li>Fixed Camera Angles &amp; Boundary Check</li>
+              <li>First Visit Fee Credited 100% On Annual Plan</li>
+            </ul>
+
+            <a id="est-book-btn" href="https://wa.me/919242143775" target="_blank" class="btn btn-whatsapp" style="padding: 14px 28px; width: 100%; justify-content: center;">
+              <span>Confirm &amp; Book via WhatsApp</span>
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -573,12 +579,12 @@
                 </tr>
                 <tr>
                   <td><strong>4. Waste &amp; debris</strong></td>
-                  <td><span class="status-dot warn">⚠️ ACTION ADVISED</span></td>
+                  <td><span class="status-dot warn">ACTION ADVISED</span></td>
                   <td>Construction debris, northern edge — new since last visit</td>
                 </tr>
                 <tr>
                   <td><strong>5. Overgrowth</strong></td>
-                  <td><span class="status-dot warn">⚠️ ACTION ADVISED</span></td>
+                  <td><span class="status-dot warn">ACTION ADVISED</span></td>
                   <td>Knee height across site — clearing advised</td>
                 </tr>
                 <tr>
@@ -621,7 +627,7 @@
                 <span class="pos-chip">POSITION A</span>
                 <h4 style="font-size: 0.95rem; color: var(--brand-navy); margin-top: 4px;">North-east corner, facing south-west</h4>
                 <p style="font-size: 0.85rem; color: var(--text-muted);">Wide shot showing full site, visible boundaries and adjoining plot.</p>
-                <div class="geotag-line">📍 GPS: 12.9716 N, 77.5946 E · 14 Aug 2026 10:35 IST</div>
+                <div class="geotag-line">GPS: 12.9716 N, 77.5946 E · 14 Aug 2026 10:35 IST</div>
               </div>
             </div>
 
@@ -631,7 +637,7 @@
                 <span class="pos-chip">POSITION B</span>
                 <h4 style="font-size: 0.95rem; color: var(--brand-navy); margin-top: 4px;">South-west corner, facing north-east</h4>
                 <p style="font-size: 0.85rem; color: var(--text-muted);">Opposite wide shot. Together A and B cover the whole site.</p>
-                <div class="geotag-line">📍 GPS: 12.9716 N, 77.5946 E · 14 Aug 2026 10:42 IST</div>
+                <div class="geotag-line">GPS: 12.9716 N, 77.5946 E · 14 Aug 2026 10:42 IST</div>
               </div>
             </div>
 
@@ -641,7 +647,7 @@
                 <span class="pos-chip">POSITION C</span>
                 <h4 style="font-size: 0.95rem; color: var(--brand-navy); margin-top: 4px;">Road frontage, facing the site</h4>
                 <p style="font-size: 0.85rem; color: var(--text-muted);">Access, gate, ownership signage and approach condition.</p>
-                <div class="geotag-line">📍 GPS: 12.9716 N, 77.5946 E · 14 Aug 2026 10:48 IST</div>
+                <div class="geotag-line">GPS: 12.9716 N, 77.5946 E · 14 Aug 2026 10:48 IST</div>
               </div>
             </div>
 
@@ -651,7 +657,7 @@
                 <span class="pos-chip">POSITION D</span>
                 <h4 style="font-size: 0.95rem; color: var(--brand-navy); margin-top: 4px;">Centre of site, facing north</h4>
                 <p style="font-size: 0.85rem; color: var(--text-muted);">Ground condition, overgrowth height and dumping examination.</p>
-                <div class="geotag-line">📍 GPS: 12.9716 N, 77.5946 E · 14 Aug 2026 10:55 IST</div>
+                <div class="geotag-line">GPS: 12.9716 N, 77.5946 E · 14 Aug 2026 10:55 IST</div>
               </div>
             </div>
           </div>
@@ -681,7 +687,7 @@
   <section class="poa-band">
     <div class="container">
       <div class="poa-trust-card reveal-on-scroll">
-        <div class="poa-badge">🛡️ ABSOLUTE TRUST &amp; ZERO POWER OF ATTORNEY POLICY</div>
+        <div class="poa-badge">ABSOLUTE TRUST &amp; ZERO POWER OF ATTORNEY POLICY</div>
         <h2>We do not take Power of Attorney.</h2>
         <p>We do not ask for Power of Attorney, and we do not hold your original title documents. We have never taken either, and we do not intend to.</p>
         <p>Everything we do — visiting, photographing, clearing, checking a boundary, meeting a plumber — is done under a service agreement and your written instruction. None of it requires us to stand in your place legally.</p>

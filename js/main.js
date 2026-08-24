@@ -341,6 +341,8 @@ function initFormHandler() {
 // Interactive Property Fee Estimator Engine
 function initFeeEstimator() {
   const propSelect = document.getElementById('est-proptype');
+  const sizeSelect = document.getElementById('est-size');
+  const sizeLabel = document.getElementById('est-size-label');
   const zoneSelect = document.getElementById('est-zone');
   const planSelect = document.getElementById('est-plan');
   const priceDisplay = document.getElementById('est-price-val');
@@ -349,27 +351,74 @@ function initFeeEstimator() {
 
   if (!propSelect || !priceDisplay) return;
 
+  function updateSizeDropdown() {
+    if (!sizeSelect) return;
+    const currentVal = sizeSelect.value;
+    const isSite = propSelect.value === 'site';
+
+    if (sizeLabel) {
+      sizeLabel.textContent = isSite ? 'Plot / Site Dimensions' : 'Flat / Property Configuration';
+    }
+
+    if (isSite) {
+      sizeSelect.innerHTML = `
+        <option value="1bhk" ${currentVal === '1bhk' || currentVal === 'small' ? 'selected' : ''}>Up to 30x40 (&lt; 1,200 sq ft)</option>
+        <option value="2bhk" ${currentVal === '2bhk' || currentVal === 'medium' || !currentVal ? 'selected' : ''}>30x40 to 40x60 (1,200 - 2,400 sq ft)</option>
+        <option value="3bhk" ${currentVal === '3bhk' || currentVal === 'large' ? 'selected' : ''}>40x60 to 50x80 (2,400 - 4,000 sq ft)</option>
+        <option value="4bhk" ${currentVal === '4bhk' || currentVal === 'xlarge' ? 'selected' : ''}>50x80+ / Large Site (&gt; 4,000 sq ft)</option>
+      `;
+    } else {
+      sizeSelect.innerHTML = `
+        <option value="1bhk" ${currentVal === '1bhk' || currentVal === 'small' ? 'selected' : ''}>1 BHK / Studio (&lt; 900 sq ft)</option>
+        <option value="2bhk" ${currentVal === '2bhk' || currentVal === 'medium' || !currentVal ? 'selected' : ''}>2 BHK (900 - 1,500 sq ft)</option>
+        <option value="3bhk" ${currentVal === '3bhk' || currentVal === 'large' ? 'selected' : ''}>3 BHK (1,500 - 2,400 sq ft)</option>
+        <option value="4bhk" ${currentVal === '4bhk' || currentVal === 'xlarge' ? 'selected' : ''}>4+ BHK / Duplex / Villa (&gt; 2,400 sq ft)</option>
+      `;
+    }
+  }
+
   function updateEstimate() {
     const prop = propSelect.value;
+    const size = sizeSelect ? sizeSelect.value : '2bhk';
     const zone = zoneSelect.value;
     const plan = planSelect.value;
 
     let firstVisitFee = zone === 'outskirts' ? 3500 : 2500;
-    let annualFee = 16000;
+    if (size === '3bhk') firstVisitFee += 500;
+    if (size === '4bhk') firstVisitFee += 1000;
+
+    let baseAnnualFee = 16000;
     let freqText = '4 inspections / year';
 
     if (prop === 'site') {
-      annualFee = plan === 'monthly' ? 28000 : 16000;
+      if (size === '1bhk') baseAnnualFee = plan === 'monthly' ? 24000 : 14000;
+      else if (size === '2bhk') baseAnnualFee = plan === 'monthly' ? 28000 : 16000;
+      else if (size === '3bhk') baseAnnualFee = plan === 'monthly' ? 34000 : 20000;
+      else if (size === '4bhk') baseAnnualFee = plan === 'monthly' ? 44000 : 26000;
       freqText = plan === 'monthly' ? '12 inspections / year' : '4 inspections / year';
     } else if (prop === 'unoccupied') {
-      annualFee = plan === 'monthly' ? 36000 : 22000;
+      if (size === '1bhk') baseAnnualFee = plan === 'monthly' ? 30000 : 18000;
+      else if (size === '2bhk') baseAnnualFee = plan === 'monthly' ? 36000 : 22000;
+      else if (size === '3bhk') baseAnnualFee = plan === 'monthly' ? 44000 : 28000;
+      else if (size === '4bhk') baseAnnualFee = plan === 'monthly' ? 56000 : 36000;
       freqText = plan === 'monthly' ? '12 inspections / year' : '4 inspections / year';
     } else if (prop === 'rented') {
-      annualFee = 44000;
+      if (size === '1bhk') baseAnnualFee = 38000;
+      else if (size === '2bhk') baseAnnualFee = 44000;
+      else if (size === '3bhk') baseAnnualFee = 54000;
+      else if (size === '4bhk') baseAnnualFee = 68000;
       freqText = '12 inspections / year (Monthly)';
     } else if (prop === 'construction') {
-      annualFee = plan === 'monthly' ? 36000 : 24000;
+      if (size === '1bhk') baseAnnualFee = plan === 'monthly' ? 30000 : 20000;
+      else if (size === '2bhk') baseAnnualFee = plan === 'monthly' ? 36000 : 24000;
+      else if (size === '3bhk') baseAnnualFee = plan === 'monthly' ? 44000 : 30000;
+      else if (size === '4bhk') baseAnnualFee = plan === 'monthly' ? 56000 : 38000;
       freqText = plan === 'monthly' ? '12 inspections / year' : '4 inspections / year';
+    }
+
+    let annualFee = baseAnnualFee;
+    if (zone === 'outskirts' && plan !== 'first_visit') {
+      annualFee += (plan === 'monthly' ? 4000 : 2000);
     }
 
     if (plan === 'first_visit') {
@@ -381,13 +430,22 @@ function initFeeEstimator() {
     }
 
     if (bookBtn) {
-      const msg = `Hello PropVigil Team,%0A%0AI used the website estimator:%0A- Property Type: ${encodeURIComponent(propSelect.options[propSelect.selectedIndex].text)}%0A- Zone: ${encodeURIComponent(zoneSelect.options[zoneSelect.selectedIndex].text)}%0A- Plan Selected: ${encodeURIComponent(planSelect.options[planSelect.selectedIndex].text)}%0A- Estimated Fee: ${priceDisplay.textContent}%0A%0APlease confirm my inspection date.`;
+      const sizeText = sizeSelect && sizeSelect.options[sizeSelect.selectedIndex] ? sizeSelect.options[sizeSelect.selectedIndex].text : '';
+      const msg = `Hello PropVigil Team,%0A%0AI used the website estimator:%0A- Property Category: ${encodeURIComponent(propSelect.options[propSelect.selectedIndex].text)}%0A- Property / Flat Size: ${encodeURIComponent(sizeText)}%0A- Location Zone: ${encodeURIComponent(zoneSelect.options[zoneSelect.selectedIndex].text)}%0A- Plan Selected: ${encodeURIComponent(planSelect.options[planSelect.selectedIndex].text)}%0A- Estimated Fee: ${priceDisplay.textContent}%0A%0APlease confirm my inspection date.`;
       bookBtn.href = `https://wa.me/919242143775?text=${msg}`;
     }
   }
 
-  propSelect.addEventListener('change', updateEstimate);
+  propSelect.addEventListener('change', () => {
+    updateSizeDropdown();
+    updateEstimate();
+  });
+  if (sizeSelect) {
+    sizeSelect.addEventListener('change', updateEstimate);
+  }
   zoneSelect.addEventListener('change', updateEstimate);
   planSelect.addEventListener('change', updateEstimate);
+
+  updateSizeDropdown();
   updateEstimate();
 }
