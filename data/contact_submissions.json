@@ -1,12 +1,26 @@
-﻿[{
-    "id":  "contact-20260821105348",
-    "name":  "Test User",
-    "country":  "",
-    "phone":  "+91 9999999999",
-    "prop_type":  "Vacant Land",
-    "location":  "Bengaluru",
-    "preferred_time":  "",
-    "notes":  "",
-    "submitted_at":  "2026-08-21T10:53:48.2395074+05:30",
-    "target_email":  "saikrupaassociates@gmail.com"
-}]
+﻿[
+    {
+        "id":  "contact-20260821105348",
+        "name":  "Test User",
+        "country":  "",
+        "phone":  "+91 9999999999",
+        "prop_type":  "Vacant Land",
+        "location":  "Bengaluru",
+        "preferred_time":  "",
+        "notes":  "",
+        "submitted_at":  "2026-08-21T10:53:48.2395074+05:30",
+        "target_email":  "saikrupaassociates@gmail.com"
+    },
+    {
+        "id":  "contact-20260825111859",
+        "name":  "John Doe",
+        "country":  "USA",
+        "phone":  "+15551234567",
+        "prop_type":  "Unoccupied flat",
+        "location":  "Whitefield",
+        "preferred_time":  "EST / PST (USA \u0026 Canada)",
+        "notes":  "This is a test message.",
+        "submitted_at":  "2026-08-25T11:18:59.4278921+05:30",
+        "target_email":  "saikrupaassociates@gmail.com"
+    }
+]

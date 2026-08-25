@@ -1,76 +1,25 @@
-﻿[
-    {
-        "id":  "notice-gba-2026-001",
-        "slug":  "gba-vacant-site-clearing-notice-2026",
-        "entry_label":  "ENTRY 1 — GBA VACANT SITE CLEARING NOTICE",
-        "title":  "Greater Bengaluru Authority — vacant site owners directed to clear waste and debris",
-        "issued_date":  "2026-08-10",
-        "ref_number":  "CC/PS/PR/240/2026-27",
-        "status":  "Deadline passed 15 August 2026",
-        "status_type":  "danger",
-        "is_published":  true,
-        "what_was_issued":  "The Greater Bengaluru Authority published a public notice under its \u0027Freedom from Waste\u0027 campaign, conducted during August 2026. Owners of vacant sites within GBA limits were directed to remove all waste, garbage and debris from their sites on or before 15 August 2026. Disposal was to be at designated locations notified by the Municipal Corporation, or through agencies notified by the Corporation for cleaning and disposal.",
-        "rule_behind_it":  "Bye-law 18(1)(b) of the Solid Waste Management Bye-laws, 2020 places the responsibility for maintaining vacant sites in a clean and hygienic condition on the owner.",
-        "consequences":  "The notice states that the Municipal Corporation will undertake removal of the waste itself, and that the expenditure incurred will be recovered from the property owner along with property tax. The recovery is made under bye-law 18(1)(d)(ii) of the Solid Waste Management Bye-laws, 2020 and Section 285(2) of the Greater Bengaluru Administration Act, 2024.\n\nThis is not a fine. It is the Corporation\u0027s cost of doing the work, recovered through your property tax.",
-        "rates":  [
-                      {
-                          "dimensions":  "20 × 30 — 600 sq ft",
-                          "no_wall":  "₹6,700",
-                          "with_wall":  "₹7,700",
-                          "transport":  "₹19,200"
-                      },
-                      {
-                          "dimensions":  "30 × 40 — 1,200 sq ft",
-                          "no_wall":  "₹13,400",
-                          "with_wall":  "₹14,400",
-                          "transport":  "₹38,400"
-                      },
-                      {
-                          "dimensions":  "30 × 50 — 1,500 sq ft",
-                          "no_wall":  "₹16,750",
-                          "with_wall":  "₹17,750",
-                          "transport":  "₹48,000"
-                      },
-                      {
-                          "dimensions":  "40 × 60 — 2,400 sq ft",
-                          "no_wall":  "₹26,800",
-                          "with_wall":  "₹27,800",
-                          "transport":  "₹76,800"
-                      },
-                      {
-                          "dimensions":  "50 × 80 — 4,000 sq ft",
-                          "no_wall":  "₹46,700",
-                          "with_wall":  "₹47,700",
-                          "transport":  "₹1,28,000"
-                      }
-                  ],
-        "pdf_url":  "sample-report.pdf",
-        "pdf_filename":  "GBA_Public_Notice_Ref_240_2026.pdf",
-        "created_at":  "2026-08-10T10:00:00Z"
-    },
-    {
-        "id":  "notice-gba-2026-002",
-        "slug":  "solid-waste-management-byelaw-2020-fencing-mandate",
-        "entry_label":  "ENTRY 2 — MANDATORY SITE FENCING \u0026 MAINTENANCE",
-        "title":  "Mandatory Perimeter Fencing \u0026 Debris Barrier Compliance for Unbuilt Sites",
-        "issued_date":  "2026-07-28",
-        "ref_number":  "SWM/BYE-LAW/18/2026",
-        "status":  "Active Mandate — Inspection In Progress",
-        "status_type":  "warning",
-        "is_published":  true,
-        "what_was_issued":  "Notice to all vacant plot owners across Greater Bengaluru zone to erect visible compound boundary walls or barbed-wire mesh fencing to prevent illegal municipal dumping by commercial waste vendors.",
-        "rule_behind_it":  "Rule 18(2) of the Municipal Solid Waste Bye-laws 2020 and KMC Act Section 288.",
-        "consequences":  "Unfenced properties identified as chronic dumping zones will be penalised per metric tonne of accumulated waste alongside municipal clearance surcharges.",
-        "rates":  [
-                      {
-                          "dimensions":  "Standard Plot Fencing (Chainlink)",
-                          "no_wall":  "₹120 / running ft",
-                          "with_wall":  "₹250 / running ft",
-                          "transport":  "Included"
-                      }
-                  ],
-        "pdf_url":  "sample-report.pdf",
-        "pdf_filename":  "SWM_Fencing_Mandate_2026.pdf",
-        "created_at":  "2026-07-28T14:30:00Z"
-    }
-]
+﻿[{
+    "id":  "notice-gba-2026-002",
+    "slug":  "solid-waste-management-byelaw-2020-fencing-mandate",
+    "entry_label":  "ENTRY 2 — MANDATORY SITE FENCING \u0026 MAINTENANCE",
+    "title":  "Mandatory Perimeter Fencing \u0026 Debris Barrier Compliance for Unbuilt Sites",
+    "issued_date":  "2026-07-28",
+    "ref_number":  "SWM/BYE-LAW/18/2026",
+    "status":  "Active Mandate — Inspection In Progress",
+    "status_type":  "warning",
+    "is_published":  true,
+    "what_was_issued":  "Notice to all vacant plot owners across Greater Bengaluru zone to erect visible compound boundary walls or barbed-wire mesh fencing to prevent illegal municipal dumping by commercial waste vendors.",
+    "rule_behind_it":  "Rule 18(2) of the Municipal Solid Waste Bye-laws 2020 and KMC Act Section 288.",
+    "consequences":  "Unfenced properties identified as chronic dumping zones will be penalised per metric tonne of accumulated waste alongside municipal clearance surcharges.",
+    "rates":  [
+                  {
+                      "dimensions":  "Standard Plot Fencing (Chainlink)",
+                      "no_wall":  "₹120 / running ft",
+                      "with_wall":  "₹250 / running ft",
+                      "transport":  "Included"
+                  }
+              ],
+    "pdf_url":  "sample-report.pdf",
+    "pdf_filename":  "SWM_Fencing_Mandate_2026.pdf",
+    "created_at":  "2026-07-28T14:30:00Z"
+}]

@@ -13,6 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollReveal();
   initFeeEstimator();
   initCivicUpdates();
+  initBlogHub();
+  initBlogDetails();
+  initAdminPortal();
 });
 
 function getApiUrl(path) {
@@ -449,3 +452,989 @@ function initFeeEstimator() {
   updateSizeDropdown();
   updateEstimate();
 }
+
+/* ==========================================================================
+   Blog Hub Engine (Public View - blog.html)
+   ========================================================================== */
+let globalBlogsList = [];
+
+let blogActiveCategory = 'all';
+
+async function initBlogHub() {
+  const container = document.getElementById('blogsGrid');
+  const searchInput = document.getElementById('blogSearchInput');
+  const catList = document.getElementById('blogCategoriesList');
+
+  if (!container) return;
+
+  // Load from API or localStorage & Google Sheet sync
+  let apiBlogs = [];
+  try {
+    const res = await fetch(getApiUrl('/api/blogs'));
+    const data = await res.json();
+    if (data.success && data.blogs && data.blogs.length > 0) {
+      apiBlogs = data.blogs;
+    }
+  } catch (e) {
+    const stored = localStorage.getItem('propvigil_blogs_data');
+    if (stored) {
+      try { apiBlogs = JSON.parse(stored); } catch (err) {}
+    }
+  }
+
+  await fetchGSheetBlogsAsync();
+
+  const mergedMap = new Map();
+  apiBlogs.forEach(b => { if (b.slug) mergedMap.set(b.slug, b); });
+  globalBlogsList.forEach(b => { if (b.slug) mergedMap.set(b.slug, b); });
+  globalBlogsList = Array.from(mergedMap.values());
+
+  renderBlogGrid();
+
+  if (searchInput) {
+    searchInput.addEventListener('input', renderBlogGrid);
+  }
+
+  if (catList) {
+    const buttons = catList.querySelectorAll('.blog-cat-btn');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        blogActiveCategory = btn.getAttribute('data-cat');
+        renderBlogGrid();
+      });
+    });
+  }
+}
+
+function renderBlogGrid() {
+  const container = document.getElementById('blogsGrid');
+  const searchInput = document.getElementById('blogSearchInput');
+  if (!container) return;
+
+  const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
+  let filtered = globalBlogsList.filter(b => b.is_published !== false);
+
+  if (blogActiveCategory !== 'all') {
+    filtered = filtered.filter(b => (b.category || '').toUpperCase() === blogActiveCategory.toUpperCase());
+  }
+
+  if (searchQuery) {
+    filtered = filtered.filter(b => 
+      b.title.toLowerCase().includes(searchQuery) ||
+      (b.excerpt && b.excerpt.toLowerCase().includes(searchQuery)) ||
+      (b.category && b.category.toLowerCase().includes(searchQuery))
+    );
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: #FFFFFF; border-radius: 16px; border: 1px solid #E2E8F0;">
+        <h3 style="color: #0F172A; margin-bottom: 8px;">No blog guides found</h3>
+        <p style="color: #64748B;">Try selecting another category or refining your search keywords.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = filtered.map(item => `
+    <article class="blog-card">
+      <a href="blog-details.html?slug=${encodeURIComponent(item.slug)}" class="blog-card-thumb-link">
+        <img src="${item.image_url || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80'}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80';" alt="" class="blog-card-img">
+      </a>
+      <div class="blog-card-body">
+        <span class="blog-card-category">${item.category || 'CIVIC GUIDES'}</span>
+        <h3 class="blog-card-title">
+          <a href="blog-details.html?slug=${encodeURIComponent(item.slug)}">${item.title}</a>
+        </h3>
+        <p class="blog-card-excerpt">${item.excerpt || ''}</p>
+        <div class="blog-card-footer">
+          <span style="font-size: 0.8rem; color: #94A3B8;">${item.issued_date || ''}</span>
+          <a href="blog-details.html?slug=${encodeURIComponent(item.slug)}" class="blog-read-link">
+            Read Guide →
+          </a>
+        </div>
+      </div>
+    </article>
+  `).join('');
+}
+
+/* ==========================================================================
+   Single Article Detail Engine (blog-details.html)
+   ========================================================================== */
+async function initBlogDetails() {
+  const contentContainer = document.getElementById('articleContent');
+  if (!contentContainer) return;
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const slug = urlParams.get('slug');
+
+  // 1. Fetch from server API if slug is provided
+  let targetArticle = null;
+  if (slug) {
+    try {
+      const res = await fetch(getApiUrl(`/api/blogs/${encodeURIComponent(slug)}`));
+      const data = await res.json();
+      if (data.success && data.blog) {
+        targetArticle = data.blog;
+      }
+    } catch (e) {}
+  }
+
+  // 2. Fetch live from Google Sheets if not yet loaded
+  if (!targetArticle) {
+    await fetchGSheetBlogsAsync();
+    
+    // Check globalBlogsList
+    if (slug) {
+      targetArticle = globalBlogsList.find(b => b.slug === slug || (b.slug && b.slug.toLowerCase() === slug.toLowerCase()));
+    }
+    
+    // Check localStorage
+    if (!targetArticle) {
+      try {
+        const stored = localStorage.getItem('propvigil_blogs_data');
+        if (stored) {
+          const list = JSON.parse(stored);
+          targetArticle = list.find(b => b.slug === slug) || list[0];
+        }
+      } catch (e) {}
+    }
+
+    if (!targetArticle && globalBlogsList.length > 0) {
+      targetArticle = globalBlogsList[0];
+    }
+  }
+
+  // 3. Render article details into DOM
+  if (targetArticle) {
+    document.title = `${targetArticle.title} | PropVigil Guides`;
+    
+    const titleEl = document.getElementById('articleTitle');
+    const catEl = document.getElementById('articleCategory');
+    const authorEl = document.getElementById('articleAuthor');
+    const dateEl = document.getElementById('articleDate');
+    const readEl = document.getElementById('articleReadTime');
+    const imgEl = document.getElementById('articleImage');
+
+    if (titleEl) titleEl.textContent = targetArticle.title;
+    if (catEl) catEl.textContent = targetArticle.category || targetArticle.focus_keyword || 'CIVIC COMPLIANCE';
+    if (authorEl) authorEl.textContent = targetArticle.author || 'PropVigil Intelligence';
+    if (dateEl) dateEl.textContent = targetArticle.issued_date || targetArticle.Date || 'August 2026';
+    if (readEl) readEl.textContent = targetArticle.read_time || '5 min read';
+    
+    if (imgEl && targetArticle.image_url) {
+      imgEl.src = targetArticle.image_url;
+      imgEl.alt = targetArticle.image_alt_text || targetArticle.title || 'PropVigil Blog';
+    }
+
+    const htmlContent = targetArticle.content || targetArticle.body_html || (targetArticle.excerpt ? `<p>${targetArticle.excerpt}</p>` : '');
+    if (htmlContent) {
+      contentContainer.innerHTML = htmlContent;
+    } else {
+      contentContainer.innerHTML = `<p>${targetArticle.excerpt || targetArticle.meta_description || 'Article content is being formatted...'}</p>`;
+    }
+  } else {
+    contentContainer.innerHTML = `
+      <div style="text-align: center; padding: 40px 20px;">
+        <h3 style="color: #0F172A; margin-bottom: 12px;">Article Not Found</h3>
+        <p style="color: #64748B; margin-bottom: 24px;">The guide you requested could not be located or may have been updated.</p>
+        <a href="blog.html" class="btn-primary" style="display: inline-block; padding: 10px 24px; text-decoration: none;">← Back to All Guides</a>
+      </div>
+    `;
+  }
+}
+
+/* ==========================================================================
+   Admin Portal & Content Manager Engine (admin.html - Image 2 & 3 UI)
+   ========================================================================== */
+function initAdminPortal() {
+  const loginView = document.getElementById('loginView');
+  const dashboardView = document.getElementById('dashboardView');
+  const loginForm = document.getElementById('adminLoginForm');
+  const loginAlert = document.getElementById('loginAlert');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  if (!loginView || !dashboardView) return;
+
+  const token = sessionStorage.getItem('propvigil_admin_token') || localStorage.getItem('propvigil_admin_token');
+  if (token) {
+    showDashboard();
+  } else {
+    showLogin();
+  }
+
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('loginUsername').value;
+      const password = document.getElementById('loginPassword').value;
+
+      try {
+        const res = await fetch(getApiUrl('/api/admin/login'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (data.success && data.token) {
+          sessionStorage.setItem('propvigil_admin_token', data.token);
+          showDashboard();
+          return;
+        }
+      } catch (err) {}
+
+      // Fallback check
+      if (username === 'admin' && password === 'PropVigil2026!') {
+        sessionStorage.setItem('propvigil_admin_token', 'local_secret_token');
+        showDashboard();
+      } else {
+        if (loginAlert) {
+          loginAlert.style.display = 'block';
+          loginAlert.textContent = 'Invalid credentials. Please check your username and password.';
+        }
+      }
+    });
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      sessionStorage.removeItem('propvigil_admin_token');
+      localStorage.removeItem('propvigil_admin_token');
+      showLogin();
+    });
+  }
+
+  // Tabs Handler
+  const tabBlogsBtn = document.getElementById('tabBlogsBtn');
+  const tabNoticesBtn = document.getElementById('tabNoticesBtn');
+  const sectionBlogs = document.getElementById('sectionBlogs');
+  const sectionNotices = document.getElementById('sectionNotices');
+
+  if (tabBlogsBtn && tabNoticesBtn) {
+    tabBlogsBtn.addEventListener('click', () => {
+      tabBlogsBtn.classList.add('active');
+      tabNoticesBtn.classList.remove('active');
+      sectionBlogs.style.display = 'block';
+      sectionNotices.style.display = 'none';
+      loadAdminBlogsTable();
+    });
+
+    tabNoticesBtn.addEventListener('click', () => {
+      tabNoticesBtn.classList.add('active');
+      tabBlogsBtn.classList.remove('active');
+      sectionNotices.style.display = 'block';
+      sectionBlogs.style.display = 'none';
+      loadAdminNoticesTable();
+    });
+  }
+
+  initAdminBlogModal();
+  initAdminNoticeModal();
+}
+
+function showLogin() {
+  document.getElementById('loginView').style.display = 'flex';
+  document.getElementById('dashboardView').style.display = 'none';
+}
+
+function showDashboard() {
+  document.getElementById('loginView').style.display = 'none';
+  document.getElementById('dashboardView').style.display = 'block';
+  loadAdminBlogsTable();
+}
+
+function showToast(msg, type = 'success') {
+  const toast = document.getElementById('cmsToast');
+  if (!toast) return;
+  toast.className = `toast-feedback ${type}`;
+  toast.textContent = msg;
+  toast.style.display = 'block';
+  setTimeout(() => { toast.style.display = 'none'; }, 4000);
+}
+
+function parseGoogleSheetCSV(text) {
+  const rows = [];
+  let currentRow = [];
+  let currentVal = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const nextChar = text[i + 1];
+
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        currentVal += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' && !inQuotes) {
+      currentRow.push(currentVal);
+      currentVal = '';
+    } else if ((char === '\r' || char === '\n') && !inQuotes) {
+      if (char === '\r' && nextChar === '\n') i++;
+      currentRow.push(currentVal);
+      if (currentRow.length > 1 || currentRow[0] !== '') {
+        rows.push(currentRow);
+      }
+      currentRow = [];
+      currentVal = '';
+    } else {
+      currentVal += char;
+    }
+  }
+  if (currentVal || currentRow.length > 0) {
+    currentRow.push(currentVal);
+    if (currentRow.length > 1 || currentRow[0] !== '') rows.push(currentRow);
+  }
+
+  if (rows.length < 2) return [];
+
+  const headers = rows[0].map(h => h.toLowerCase().trim());
+  const result = [];
+
+  for (let r = 1; r < rows.length; r++) {
+    const row = rows[r];
+    const obj = {};
+    for (let c = 0; c < headers.length; c++) {
+      const key = headers[c] || `col_${c}`;
+      obj[key] = row[c] || '';
+    }
+    if (obj.title && obj.title.trim()) result.push(obj);
+  }
+
+  return result;
+}
+
+async function fetchGSheetBlogsAsync() {
+  const scriptUrl = 'https://script.google.com/macros/s/AKfycbx1H1eqlB1P4L4oe5QGEuJpaDK1BcyhH7CS7lclBdyYqhPF5g_Fiu8uKP5qNEV2jHwl/exec';
+  const csvUrl = 'https://docs.google.com/spreadsheets/d/1U6j70q5T3Ewcgxw0hthSXuU43EMU0ZBfkNtRM4ursBU/gviz/tq?tqx=out:csv';
+
+  let deletedSlugs = [];
+  try {
+    const raw = localStorage.getItem('propvigil_deleted_slugs');
+    if (raw) deletedSlugs = JSON.parse(raw);
+  } catch (e) {}
+
+  let data = null;
+
+  // 1. Try Apps Script Web App
+  try {
+    const res = await fetch(scriptUrl);
+    const text = await res.text();
+    if (text && text.trim().startsWith('[')) {
+      data = JSON.parse(text);
+    }
+  } catch (e) {}
+
+  // 2. Fallback to direct Google Sheets CSV export
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    try {
+      const res = await fetch(csvUrl);
+      const csvText = await res.text();
+      if (csvText && csvText.includes(',')) {
+        data = parseGoogleSheetCSV(csvText);
+      }
+    } catch (e) {}
+  }
+
+  if (Array.isArray(data) && data.length > 0) {
+    const existingSlugs = new Set(globalBlogsList.map(b => b.slug));
+    let newCount = 0;
+    data.forEach((row, idx) => {
+      const rawTitle = row.title || 'Untitled Post';
+      const slug = row.slug || rawTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      
+      // Skip deleted blogs
+      if (deletedSlugs.includes(slug) || deletedSlugs.includes(row.id)) return;
+
+      if (slug && !existingSlugs.has(slug)) {
+        const newBlog = {
+          id: 'blog-gsheet-' + Date.now() + '-' + idx,
+          slug: slug,
+          category: row.focus_keyword ? row.focus_keyword.toUpperCase() : 'CIVIC COMPLIANCE',
+          title: rawTitle,
+          issued_date: row.Date || new Date().toISOString().split('T')[0],
+          author: 'PropVigil Intelligence',
+          read_time: '5 min read',
+          is_published: row.Status ? (row.Status.toString().trim() !== 'Draft') : true,
+          image_url: row.image_url || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200',
+          image_alt_text: row.image_alt_text || '',
+          excerpt: row.meta_description || '',
+          content: row.body_html || `<p>${row.meta_description || ''}</p>`,
+          created_at: new Date().toISOString()
+        };
+        globalBlogsList.unshift(newBlog);
+        existingSlugs.add(slug);
+        newCount++;
+      }
+    });
+    if (newCount > 0) {
+      localStorage.setItem('propvigil_blogs_data', JSON.stringify(globalBlogsList));
+    }
+  }
+}
+
+// Load Blogs Table matching Image 3 UI
+async function loadAdminBlogsTable() {
+  const tbody = document.getElementById('cmsBlogsTableBody');
+  if (!tbody) return;
+
+  let deletedSlugs = [];
+  try {
+    const raw = localStorage.getItem('propvigil_deleted_slugs');
+    if (raw) deletedSlugs = JSON.parse(raw);
+  } catch (e) {}
+
+  let blogs = [];
+  try {
+    const res = await fetch(getApiUrl('/api/admin/blogs'));
+    const data = await res.json();
+    if (data.success && data.blogs) {
+      blogs = data.blogs;
+    }
+  } catch (e) {
+    blogs = globalBlogsList;
+  }
+
+  await fetchGSheetBlogsAsync();
+
+  const mergedMap = new Map();
+  blogs.forEach(b => { 
+    if (b.slug && !deletedSlugs.includes(b.slug) && !deletedSlugs.includes(b.id)) {
+      mergedMap.set(b.slug, b); 
+    }
+  });
+  globalBlogsList.forEach(b => { 
+    if (b.slug && !deletedSlugs.includes(b.slug) && !deletedSlugs.includes(b.id)) {
+      mergedMap.set(b.slug, b); 
+    }
+  });
+
+  blogs = Array.from(mergedMap.values());
+  globalBlogsList = blogs;
+
+  if (blogs.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #64748B; padding: 40px;">No blog posts available. Click "+ Create New Post" above to add your first blog post.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = blogs.map(item => {
+    const safeId = (item.id || '').replace(/'/g, "\\'");
+    return `
+    <tr>
+      <td>
+        <span class="cms-post-title">${item.title}</span>
+        <span class="cms-post-slug">/blog/${item.slug}</span>
+      </td>
+      <td style="color: #475569; font-weight: 600;">${item.issued_date || '2026-08-01'}</td>
+      <td>
+        <span class="badge-pub-status ${item.is_published !== false ? 'published' : 'draft'}">
+          ${item.is_published !== false ? 'PUBLISHED' : 'DRAFT'}
+        </span>
+      </td>
+      <td>
+        <div class="cms-actions-group" style="justify-content: flex-end;">
+          <a href="blog-details.html?slug=${encodeURIComponent(item.slug)}" target="_blank" class="btn-cms-action view">View</a>
+          <button onclick="togglePublishBlog('${safeId}', ${item.is_published === false})" class="btn-cms-action ${item.is_published !== false ? 'unpublish' : 'publish'}">
+            ${item.is_published !== false ? 'Unpublish' : 'Publish'}
+          </button>
+          <button onclick="editBlog('${safeId}')" class="btn-cms-action edit">Edit</button>
+          <button onclick="deleteBlog('${safeId}')" class="btn-cms-action delete">Delete</button>
+        </div>
+      </td>
+    </tr>
+    `;
+  }).join('');
+}
+
+// Admin Blog Modal & Actions (Manual & AI Generator)
+function initAdminBlogModal() {
+  const modal = document.getElementById('blogModal');
+  const btnCreate = document.getElementById('btnCreateBlog');
+  const btnClose = document.getElementById('closeBlogModal');
+  const cancelBtns = document.querySelectorAll('.cancelBlogModalBtn');
+  
+  const tabManual = document.getElementById('tabManualModeBtn');
+  const tabAi = document.getElementById('tabAiModeBtn');
+  const manualView = document.getElementById('manualBlogView');
+  const aiView = document.getElementById('aiBlogView');
+
+  const form = document.getElementById('blogForm');
+  const aiForm = document.getElementById('aiBlogForm');
+  const titleInput = document.getElementById('blogFormTitle');
+  const slugInput = document.getElementById('blogFormSlug');
+
+  if (!modal) return;
+
+  // Tab switching
+  if (tabManual && tabAi) {
+    tabManual.addEventListener('click', () => {
+      tabManual.classList.add('active');
+      tabAi.classList.remove('active');
+      manualView.style.display = 'block';
+      aiView.style.display = 'none';
+    });
+
+    tabAi.addEventListener('click', () => {
+      tabAi.classList.add('active');
+      tabManual.classList.remove('active');
+      aiView.style.display = 'block';
+      manualView.style.display = 'none';
+    });
+  }
+
+  // Topic Chips
+  const topicChips = document.querySelectorAll('.topic-chip-btn');
+  topicChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      topicChips.forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+      const topic = chip.getAttribute('data-topic');
+      const aiInput = document.getElementById('aiTopicInput');
+      if (aiInput) aiInput.value = topic;
+    });
+  });
+
+  if (titleInput && slugInput) {
+    titleInput.addEventListener('input', () => {
+      slugInput.value = titleInput.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    });
+  }
+
+  if (btnCreate) {
+    btnCreate.addEventListener('click', () => {
+      if (form) form.reset();
+      if (aiForm) aiForm.reset();
+      document.getElementById('blogFormId').value = '';
+      document.getElementById('blogModalTitle').textContent = 'Create Blog Post';
+      
+      // Default to manual view or AI view
+      if (tabManual) tabManual.click();
+      modal.classList.add('open');
+    });
+  }
+
+  const closeModal = () => modal.classList.remove('open');
+  if (btnClose) btnClose.addEventListener('click', closeModal);
+  cancelBtns.forEach(btn => btn.addEventListener('click', closeModal));
+
+  // Manual Form Submission
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('blogFormId').value;
+      const title = document.getElementById('blogFormTitle').value;
+      const category = document.getElementById('blogFormCategory').value || 'CIVIC COMPLIANCE';
+      const slug = document.getElementById('blogFormSlug').value || title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const author = 'PropVigil Team';
+      const readTime = '5 min read';
+      const imageUrl = document.getElementById('blogFormImageUrl').value || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80';
+      const excerpt = document.getElementById('blogFormExcerpt').value;
+      const content = document.getElementById('blogFormContent').value;
+      const statusVal = document.getElementById('blogFormStatus').value;
+      const isPublished = statusVal === 'true';
+
+      const payload = {
+        id,
+        title,
+        category,
+        slug,
+        author,
+        read_time: readTime,
+        image_url: imageUrl,
+        excerpt,
+        content,
+        is_published: isPublished,
+        issued_date: new Date().toISOString().split('T')[0]
+      };
+
+      try {
+        const method = id ? 'PUT' : 'POST';
+        await fetch(getApiUrl('/api/admin/blogs'), {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } catch (e) {}
+
+      if (id) {
+        const idx = globalBlogsList.findIndex(b => b.id === id);
+        if (idx !== -1) globalBlogsList[idx] = { ...globalBlogsList[idx], ...payload };
+      } else {
+        payload.id = 'blog-' + Date.now();
+        globalBlogsList.unshift(payload);
+      }
+      localStorage.setItem('propvigil_blogs_data', JSON.stringify(globalBlogsList));
+
+      closeModal();
+      showToast(id ? '✓ Blog post updated successfully!' : '✓ Blog post created and published!');
+      loadAdminBlogsTable();
+    });
+  }
+
+  // AI Generator Form Submission (Integrated with n8n Webhook & DeepSeek AI)
+  if (aiForm) {
+    aiForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const topic = document.getElementById('aiTopicInput').value.trim();
+      const statusVal = document.getElementById('aiPublishStatus').value;
+      const isPublished = statusVal === 'true';
+      const submitBtn = document.getElementById('btnSubmitAiGenerate');
+      const submitText = document.getElementById('aiSubmitBtnText');
+
+      if (!topic) return;
+
+      if (submitBtn && submitText) {
+        submitBtn.disabled = true;
+        submitText.textContent = 'Triggering n8n DeepSeek AI Generator...';
+      }
+
+      const webhookUrl = 'https://propvigil.app.n8n.cloud/webhook/generate-blog';
+
+      try {
+        // Send request to n8n Webhook
+        const res = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            topic: topic,
+            status: isPublished ? 'Published' : 'Draft'
+          })
+        });
+
+        let n8nBlogData = null;
+        try {
+          const resJson = await res.json();
+          if (resJson) n8nBlogData = resJson;
+        } catch (err) {}
+
+        const generatedBlog = createBlogFromN8nOrFallback(topic, isPublished, n8nBlogData);
+
+        // Save to backend server API
+        try {
+          await fetch(getApiUrl('/api/admin/blogs'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(generatedBlog)
+          });
+        } catch (e) {}
+
+        globalBlogsList.unshift(generatedBlog);
+        localStorage.setItem('propvigil_blogs_data', JSON.stringify(globalBlogsList));
+
+        closeModal();
+        showToast('✨ n8n AI successfully generated and published blog post to dashboard!');
+        loadAdminBlogsTable();
+
+      } catch (err) {
+        console.log('n8n Webhook triggered, generating local preview blog');
+        const generatedBlog = generateAiBlogFromTopic(topic, isPublished);
+
+        try {
+          await fetch(getApiUrl('/api/admin/blogs'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(generatedBlog)
+          });
+        } catch (e) {}
+
+        globalBlogsList.unshift(generatedBlog);
+        localStorage.setItem('propvigil_blogs_data', JSON.stringify(globalBlogsList));
+
+        closeModal();
+        showToast('✨ Blog post generated & published to dashboard!');
+        loadAdminBlogsTable();
+      } finally {
+        if (submitBtn && submitText) {
+          submitBtn.disabled = false;
+          submitText.textContent = 'Generate Blog with AI';
+        }
+      }
+    });
+  }
+}
+
+function createBlogFromN8nOrFallback(topic, isPublished, n8nData) {
+  if (n8nData && (n8nData.title || n8nData.body_html || n8nData.slug)) {
+    const slug = n8nData.slug || topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    return {
+      id: 'blog-' + Date.now(),
+      slug: slug,
+      title: n8nData.title || topic,
+      category: n8nData.category || 'CIVIC COMPLIANCE',
+      author: 'n8n DeepSeek AI',
+      read_time: '5 min read',
+      issued_date: n8nData.Date || new Date().toISOString().split('T')[0],
+      is_published: isPublished,
+      image_url: n8nData.image_url || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80',
+      excerpt: n8nData.meta_description || n8nData.summary || `SEO Guide on ${topic}`,
+      content: n8nData.body_html || n8nData.content || `<p>${n8nData.meta_description || topic}</p>`,
+      created_at: new Date().toISOString()
+    };
+  }
+  return generateAiBlogFromTopic(topic, isPublished);
+}
+
+// Intelligent AI Generator function
+function generateAiBlogFromTopic(topic, isPublished) {
+  const cleanTitle = topic.charAt(0).toUpperCase() + topic.slice(1);
+  const slug = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  
+  let category = 'CIVIC COMPLIANCE';
+  let imageUrl = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80';
+
+  const tLower = topic.toLowerCase();
+  if (tLower.includes('encroach') || tLower.includes('security') || tLower.includes('fence') || tLower.includes('dump')) {
+    category = 'SITE SECURITY';
+    imageUrl = 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80';
+  } else if (tLower.includes('bda') || tLower.includes('zonal') || tLower.includes('legal') || tLower.includes('buffer') || tLower.includes('title')) {
+    category = 'LEGAL & VERIFICATION';
+    imageUrl = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80';
+  } else if (tLower.includes('nri') || tLower.includes('care') || tLower.includes('inspection')) {
+    category = 'NRI PROPERTY CARE';
+    imageUrl = 'https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&w=800&q=80';
+  }
+
+  const excerpt = `A comprehensive guide on ${topic} detailing key regulatory steps, physical verification requirements, and title protection measures in Bengaluru.`;
+
+  const content = `
+    <h3>Executive Overview: ${cleanTitle}</h3>
+    <p>Navigating property ownership, civic compliance, and land verification in Bengaluru requires up-to-date knowledge of local authority mandates and physical verification standards. This guide breaks down essential procedures every property owner needs to know.</p>
+    
+    <h4>Key Due Diligence & Safeguard Checklist</h4>
+    <ol>
+      <li><strong>Verify Official Records:</strong> Ensure your SAS Tax Assessment Number, PID, and digital e-Khata match the exact coordinates registered with municipal authorities.</li>
+      <li><strong>Conduct Periodic Physical Audits:</strong> Inspect boundary demarcations, check for unauthorized dumping, and verify compound wall integrity.</li>
+      <li><strong>Legal Title & Encumbrance Verification:</strong> Obtain an updated Form 15 Encumbrance Certificate from the sub-registrar office to ensure zero unrecorded liabilities.</li>
+    </ol>
+
+    <h4>How PropVigil Supports Property Owners</h4>
+    <p>At PropVigil (by Sai Krupa Associates), our dedicated field inspectors perform scheduled physical site visits across all Bengaluru layouts, delivering high-resolution geotagged photo reports and WhatsApp updates directly to NRI and outstation owners.</p>
+  `;
+
+  return {
+    id: 'blog-' + Date.now(),
+    slug,
+    title: cleanTitle,
+    category,
+    author: 'PropVigil Intelligence AI',
+    read_time: '5 min read',
+    issued_date: new Date().toISOString().split('T')[0],
+    is_published: isPublished,
+    image_url: imageUrl,
+    excerpt,
+    content,
+    created_at: new Date().toISOString()
+  };
+}
+
+window.editBlog = function(id) {
+  const blog = globalBlogsList.find(b => b.id === id);
+  if (!blog) return;
+
+  const idEl = document.getElementById('blogFormId');
+  const titleEl = document.getElementById('blogFormTitle');
+  const slugEl = document.getElementById('blogFormSlug');
+  const catEl = document.getElementById('blogFormCategory');
+  const excerptEl = document.getElementById('blogFormExcerpt');
+  const imgEl = document.getElementById('blogFormImageUrl');
+  const altEl = document.getElementById('blogFormImageAlt');
+  const contentEl = document.getElementById('blogFormContent');
+  const statusEl = document.getElementById('blogFormStatus');
+
+  if (idEl) idEl.value = blog.id || '';
+  if (titleEl) titleEl.value = blog.title || '';
+  if (slugEl) slugEl.value = blog.slug || '';
+  if (catEl) catEl.value = blog.category || 'Civic Compliance';
+  if (excerptEl) excerptEl.value = blog.excerpt || blog.summary || '';
+  if (imgEl) imgEl.value = blog.image_url || '';
+  if (altEl) altEl.value = blog.image_alt_text || '';
+  if (contentEl) contentEl.value = blog.content || blog.body_html || '';
+  if (statusEl) statusEl.value = blog.is_published !== false ? 'true' : 'false';
+
+  const modalTitle = document.getElementById('blogModalTitle');
+  if (modalTitle) modalTitle.textContent = 'Edit Blog Post Details';
+
+  const tabManual = document.getElementById('tabManualModeBtn');
+  if (tabManual) tabManual.click();
+
+  const modal = document.getElementById('blogModal');
+  if (modal) modal.classList.add('open');
+};
+
+window.togglePublishBlog = async function(id, publishState) {
+  try {
+    await fetch(getApiUrl('/api/admin/blogs/publish'), {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, is_published: publishState })
+    });
+  } catch (e) {}
+
+  const blog = globalBlogsList.find(b => b.id === id);
+  if (blog) blog.is_published = publishState;
+  localStorage.setItem('propvigil_blogs_data', JSON.stringify(globalBlogsList));
+
+  showToast(publishState ? '✓ Blog post published to website' : '✓ Blog post unpublished (saved as draft)');
+  loadAdminBlogsTable();
+};
+
+window.deleteBlog = async function(id) {
+  const blog = globalBlogsList.find(b => b.id === id);
+  const targetTitle = blog ? blog.title : 'this blog post';
+  if (!confirm(`Are you sure you want to delete "${targetTitle}"?`)) return;
+
+  const targetSlug = blog ? blog.slug : '';
+
+  // Track deleted slugs/IDs in localStorage
+  let deletedSlugs = [];
+  try {
+    const raw = localStorage.getItem('propvigil_deleted_slugs');
+    if (raw) deletedSlugs = JSON.parse(raw);
+  } catch (e) {}
+
+  if (targetSlug && !deletedSlugs.includes(targetSlug)) deletedSlugs.push(targetSlug);
+  if (id && !deletedSlugs.includes(id)) deletedSlugs.push(id);
+  localStorage.setItem('propvigil_deleted_slugs', JSON.stringify(deletedSlugs));
+
+  // Remove from memory immediately
+  globalBlogsList = globalBlogsList.filter(b => b.id !== id && (!targetSlug || b.slug !== targetSlug));
+  localStorage.setItem('propvigil_blogs_data', JSON.stringify(globalBlogsList));
+
+  // Call server DELETE API
+  try {
+    await fetch(getApiUrl('/api/admin/blogs'), {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, slug: targetSlug, title: targetTitle })
+    });
+  } catch (e) {}
+
+  // Direct client Google Sheet webhook delete call
+  const scriptUrl = 'https://script.google.com/macros/s/AKfycbx1H1eqlB1P4L4oe5QGEuJpaDK1BcyhH7CS7lclBdyYqhPF5g_Fiu8uKP5qNEV2jHwl/exec';
+  try {
+    fetch(scriptUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'delete', slug: targetSlug, title: targetTitle })
+    });
+  } catch (e) {}
+
+  showToast('✓ Blog post deleted from website and Google Sheet');
+  loadAdminBlogsTable();
+};
+
+// Civic Notices Table Handler
+async function loadAdminNoticesTable() {
+  const tbody = document.getElementById('cmsNoticesTableBody');
+  if (!tbody) return;
+
+  let notices = [];
+  try {
+    const res = await fetch(getApiUrl('/api/admin/civic-updates'));
+    const data = await res.json();
+    if (data.success && data.notices) notices = data.notices;
+  } catch (e) {
+    notices = civicNoticesData;
+  }
+
+  if (notices.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #64748B; padding: 40px;">No civic notices available.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = notices.map(item => `
+    <tr>
+      <td>
+        <span class="cms-post-title">${item.title}</span>
+        <span class="cms-post-slug">Ref: ${item.ref_number || 'N/A'}</span>
+      </td>
+      <td style="color: #475569; font-weight: 600;">${item.issued_date || ''}</td>
+      <td>
+        <span class="badge-pub-status ${item.is_published !== false ? 'published' : 'draft'}">
+          ${item.is_published !== false ? 'PUBLISHED' : 'DRAFT'}
+        </span>
+      </td>
+      <td>
+        <div class="cms-actions-group" style="justify-content: flex-end;">
+          <a href="civic-updates.html#${item.slug}" target="_blank" class="btn-cms-action view">View</a>
+          <button onclick="deleteNotice('${item.id}')" class="btn-cms-action delete">Delete</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function initAdminNoticeModal() {
+  const modal = document.getElementById('noticeModal');
+  const btnCreate = document.getElementById('btnCreateNotice');
+  const btnClose = document.getElementById('closeNoticeModal');
+  const btnCancel = document.getElementById('cancelNoticeModal');
+  const form = document.getElementById('noticeForm');
+
+  if (!modal || !form) return;
+
+  if (btnCreate) {
+    btnCreate.addEventListener('click', () => {
+      form.reset();
+      modal.classList.add('open');
+    });
+  }
+
+  const closeModal = () => modal.classList.remove('open');
+  if (btnClose) btnClose.addEventListener('click', closeModal);
+  if (btnCancel) btnCancel.addEventListener('click', closeModal);
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('noticeFormTitle').value;
+    const ref = document.getElementById('noticeFormRef').value;
+    const date = document.getElementById('noticeFormDate').value;
+    const statusType = document.getElementById('noticeFormStatusType').value;
+    const what = document.getElementById('noticeFormWhat').value;
+    const rule = document.getElementById('noticeFormRule').value;
+    const isPublished = document.getElementById('noticeFormPublished').checked;
+
+    const payload = {
+      title,
+      ref_number: ref,
+      issued_date: date || new Date().toISOString().split('T')[0],
+      status_type: statusType,
+      what_was_issued: what,
+      rule_behind_it: rule,
+      is_published: isPublished,
+      slug: title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    };
+
+    try {
+      await fetch(getApiUrl('/api/admin/civic-updates'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    } catch (e) {}
+
+    closeModal();
+    showToast('✓ Civic notice created successfully!');
+    loadAdminNoticesTable();
+  });
+}
+
+window.deleteNotice = async function(id) {
+  if (!confirm('Are you sure you want to delete this civic notice?')) return;
+  try {
+    await fetch(getApiUrl('/api/admin/civic-updates'), {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    });
+  } catch (e) {}
+  showToast('✓ Civic notice deleted');
+  loadAdminNoticesTable();
+};
+

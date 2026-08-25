@@ -1,0 +1,485 @@
+{
+  "name": "PropVigil Daily AI Blog Generator (Zero-Duplicates)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "id": "0ab3153f-a996-4624-b3c5-5fe9402cdf27",
+      "name": "Scheduler (Daily 7AM)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        2128,
+        5904
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=(Bengaluru+vacant+site+OR+BBMP+property+tax+OR+BBMP+e-khata+OR+Bengaluru+property+demolition+OR+Karnataka+land+revenue+OR+BDA+layout+OR+Bangalore+real+estate+guideline+value+OR+NRI+property+Bangalore)&hl=en-IN&gl=IN&ceid=IN:en",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "becbd436-4398-49b0-b436-64081806aad5",
+      "name": "Search Trending Civic Topics",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2380,
+        5904
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "ff44746f-7af1-46ad-bb77-972ef0ec3662",
+      "name": "Convert RSS XML to JSON",
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        2640,
+        5904
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1U6j70q5T3Ewcgxw0hthSXuU43EMU0ZBfkNtRM4ursBU",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list"
+        },
+        "options": {}
+      },
+      "id": "1c63247b-075e-4b95-b4c7-4e8dcc397386",
+      "name": "Get Already-Published Topics",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2900,
+        5904
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ohetfj0coOCVrpiz",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawItems = $items('Convert RSS XML to JSON')[0]?.json?.rss?.channel?.item || [];\nconst rssItems = Array.isArray(rawItems) ? rawItems : (rawItems ? [rawItems] : []);\nconst publishedRows = $items('Get Already-Published Topics') || [];\n\n// Stop words to strip\nconst STOP_WORDS = new Set([\n  'the','a','an','and','for','in','of','to','why','what','how','is','are','on','at',\n  'with','by','from','this','that','will','can','guide','update','news','2026','2025',\n  'bengaluru','bangalore','karnataka','property','owner','owners','plots','plot','site','land'\n]);\n\nfunction getKeywords(text) {\n  return (text || '')\n    .toLowerCase()\n    .replace(/[^a-z0-9\\s]/g, ' ')\n    .split(/\\s+/)\n    .filter(w => w.length > 2 && !STOP_WORDS.has(w));\n}\n\n// Extract all published titles, slugs, and focus keywords\nconst publishedRecords = publishedRows.map(r => {\n  const j = r.json || {};\n  const titleWords = getKeywords(j.title || '');\n  const slugWords = getKeywords((j.slug || '').replace(/-/g, ' '));\n  const focusWords = getKeywords(j.focus_keyword || '');\n  return {\n    rawTitle: j.title || '',\n    allWords: new Set([...titleWords, ...slugWords, ...focusWords])\n  };\n}).filter(p => p.allWords.size > 0);\n\nconst publishedTitleList = publishedRows.map(r => r.json?.title).filter(Boolean);\n\nfunction isDuplicate(candidateText) {\n  const candWords = getKeywords(candidateText);\n  if (candWords.length === 0) return true;\n\n  for (const pub of publishedRecords) {\n    let matchCount = 0;\n    for (const w of candWords) {\n      if (pub.allWords.has(w)) matchCount++;\n    }\n    // If 35% or more core topic keywords overlap, treat as duplicate\n    const overlapRatio = matchCount / Math.min(candWords.length, pub.allWords.size);\n    if (overlapRatio >= 0.35 || matchCount >= 3) {\n      return true;\n    }\n  }\n  return false;\n}\n\n// 30+ Diverse, High-intent Bengaluru NRI Property Topics (rotates automatically)\nconst TOPIC_LIBRARY = [\n  \"BBMP e-Khata Mandatory Digitisation: How Outstation Owners Can Verify PID Online\",\n  \"Preventing Encroachment on Vacant Plots in Bengaluru: RCC Compound Wall and Signage Guide\",\n  \"BBMP Property Tax Amnesty OTS Scheme: Penalty Waivers for Absentee Landlords\",\n  \"BMRDA and BDA Master Plan 2031 Zonal Clearances for Peripheral Bengaluru Sites\",\n  \"Kaveri 2.0 Online Encumbrance Certificate (EC) Verification for Land in Karnataka\",\n  \"Stormwater Drain (SWD) and Lake Buffer Zone Demolition Risks for Bengaluru Properties\",\n  \"Managing Inherited Ancestral Land in Devanahalli and Sarjapur: Step-by-Step Security Protocol\",\n  \"Gram Panchayat 11B Form Conversion to BBMP e-Khata in Outer Bengaluru Layouts\",\n  \"High-Tension Power Line Setback Rules and Buffer Clearances for Residential Plots\",\n  \"Agricultural Land Non-Agricultural (NA) DC Conversion Verification Guide for NRIs\",\n  \"How to Check Land Survey Numbers and RTC Pahani Records on Karnataka Bhoomi Portal\",\n  \"Preventing Fraudulent GPA and Fake Sale Deeds on Unoccupied Bengaluru Sites\",\n  \"Bengaluru Sub-Registrar Guideline Values 2026: What Property Buyers Must Know\",\n  \"Boundary Stone Marking & GPS Geotagging: Why Physical Verification Beats Satellite Maps\",\n  \"BBMP Solid Waste Management Bye-Laws: Penalties for Unmaintained Vacant Plots in Bangalore\"\n];\n\n// 1. Check RSS Feed first\nfor (const it of rssItems) {\n  const fullTitle = it.title || '';\n  const parts = fullTitle.split(' - ');\n  const cleanTitle = parts.slice(0, -1).join(' - ').trim() || fullTitle.trim();\n\n  if (!cleanTitle || cleanTitle.length < 15) continue;\n  if (isDuplicate(cleanTitle)) continue;\n\n  const snippet = (it.description || '').replace(/<[^>]*>/g, '').replace(/\\s+/g, ' ').trim();\n\n  return [{\n    json: {\n      title: cleanTitle,\n      snippet: snippet,\n      source: parts.length > 1 ? parts[parts.length - 1].trim() : 'Civic News',\n      published_titles_to_avoid: publishedTitleList.slice(-10)\n    }\n  }];\n}\n\n// 2. If RSS is duplicate/stale, pick first unused from Topic Library\nfor (const topic of TOPIC_LIBRARY) {\n  if (!isDuplicate(topic)) {\n    return [{\n      json: {\n        title: topic,\n        snippet: 'Comprehensive field guide, municipal bylaws, and prevention protocols for property owners in Bengaluru.',\n        source: 'PropVigil Civic Research Desk',\n        published_titles_to_avoid: publishedTitleList.slice(-10)\n      }\n    }];\n  }\n}\n\n// 3. Guaranteed fresh unique angle with month/year\nconst currentMonthYear = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });\nconst dynamicTitle = `Bengaluru Vacant Land Security & Civic Notice Audit: ${currentMonthYear} Field Manual`;\nreturn [{\n  json: {\n    title: dynamicTitle,\n    snippet: 'Quarterly field inspection guide, boundary dispute prevention, and municipal tax compliance.',\n    source: 'PropVigil Field Intelligence',\n    published_titles_to_avoid: publishedTitleList.slice(-10)\n  }\n}];"
+      },
+      "id": "becbf03d-8924-4113-ad00-50fc1f195442",
+      "name": "Pick First Unpublished Topic",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3160,
+        5904
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\nJSON.stringify({\n  model: \"deepseek/deepseek-chat-v3-0324\",\n  max_tokens: 2000,\n  response_format: { type: \"json_object\" },\n  messages: [\n    {\n      role: \"user\",\n      content: `Research this Bengaluru property-management & civic-compliance topic for PropVigil, an on-ground property monitoring service for NRI & outstation owners (a unit of Sai Krupa Associates):\nTopic: ${$('Pick First Unpublished Topic').first().json.title}\nContext Snippet: ${$('Pick First Unpublished Topic').first().json.snippet || ''}\n\nReturn ONLY JSON:\n{\n  \"summary\": \"\",\n  \"facts\": [],\n  \"statistics\": [],\n  \"keywords\": [],\n  \"search_intent\": \"\",\n  \"audience\": \"\",\n  \"blog_angle\": \"\"\n}`\n    }\n  ]\n})\n}}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "f13d58b8-3455-432f-bc01-a8d100e38cbf",
+      "name": "DeepSeek Research Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        3420,
+        5904
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "208PwwIharLes6G4",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let raw = $json.choices?.[0]?.message?.content || '{}';\nraw = raw.trim().replace(/^```(?:json)?\\s*/i, '').replace(/```\\s*$/i, '');\n\nconst firstBrace = raw.indexOf('{');\nconst lastBrace = raw.lastIndexOf('}');\nconst cleaned = (firstBrace !== -1 && lastBrace !== -1)\n  ? raw.slice(firstBrace, lastBrace + 1)\n  : raw;\n\nlet parsed;\ntry {\n  parsed = JSON.parse(cleaned);\n} catch(e) {\n  throw new Error(\"Research JSON parsing failed: \" + e.message);\n}\nreturn [{ json: parsed }];"
+      },
+      "id": "17febd44-a8a1-464c-9c46-a92ba0641c5a",
+      "name": "Parse Research JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3680,
+        5904
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\nJSON.stringify({\n  \"model\": \"deepseek/deepseek-chat-v3-0324\",\n  \"max_tokens\": 4096,\n  \"response_format\": { \"type\": \"json_object\" },\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": `You are an expert real estate content strategist. Write a 100% ORIGINAL, highly specific SEO article for PropVigil (propvigil.com), a Bengaluru property monitoring and boundary protection service for NRI & outstation owners (a unit of Sai Krupa Associates).\n\nCRITICAL ANTI-DUPLICATION RULE:\nDo NOT repeat or closely mirror any of these already published blogs:\n${JSON.stringify($('Pick First Unpublished Topic').first().json.published_titles_to_avoid || [], null, 2)}\n\nNew Target Topic:\n${$('Pick First Unpublished Topic').first()?.json?.title}\n\nResearch Data:\n${JSON.stringify($json, null, 2)}\n\nBrand Rules:\n- Factual, highly localized to Bengaluru (mention BBMP zones, BDA layouts, Sarjapur, Whitefield, Devanahalli, Kanakapura Road, etc.).\n- PropVigil does NOT take Power of Attorney (PoA) and does NOT hold original title deeds.\n- PropVigil does NOT act as real estate broker; our service is unbiased physical site inspection & reporting.\n- Every inspection produces a GPS geotagged report with comparison photos & video walkthrough.\n- WhatsApp CTA: +91 92421 43775.\n- Length: 900-1200 words in clean HTML body_html with single quotes for attributes (e.g. <article class='guide'>).\n- NO placeholder text for images.\n\nReturn ONLY JSON:\n{\n  \"title\": \"Unique, CTR-focused Title\",\n  \"meta_description\": \"150-character meta description with focus keyword\",\n  \"slug\": \"unique-kebab-case-slug\",\n  \"focus_keyword\": \"Unique Focus Keyword\",\n  \"body_html\": \"<article><h2>...</h2><p>...</p><h3>...</h3><ul><li>...</li></ul></article>\",\n  \"image_alt_text\": \"Descriptive alt text\"\n}`\n    }\n  ]\n})\n}}",
+        "options": {
+          "timeout": 45000
+        }
+      },
+      "id": "785b3b4b-9072-46d2-9185-93abfc2ad307",
+      "name": "Generate SEO Blog",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3940,
+        5904
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "208PwwIharLes6G4",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let raw = $json.choices?.[0]?.message?.content || '{}';\n\nraw = raw.trim().replace(/^```(?:json)?\\s*/i, '').replace(/```\\s*$/i, '');\n\nconst firstBrace = raw.indexOf('{');\nconst lastBrace = raw.lastIndexOf('}');\nconst cleaned = (firstBrace !== -1 && lastBrace !== -1)\n  ? raw.slice(firstBrace, lastBrace + 1)\n  : raw;\n\nlet parsed;\ntry {\n  parsed = JSON.parse(cleaned);\n} catch (e) {\n  throw new Error('Failed to parse blog JSON: ' + e.message);\n}\n\nif (!parsed.slug) {\n  parsed.slug = (parsed.title || 'bengaluru-property-guide')\n    .toLowerCase()\n    .replace(/[^a-z0-9]+/g, '-')\n    .replace(/(^-|-$)/g, '');\n}\n\nreturn [{ json: parsed }];"
+      },
+      "id": "dc99fd22-027c-44ba-9e3f-7ad74441ce23",
+      "name": "Parse Generated Blog JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4200,
+        5904
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.unsplash.com/search/photos",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $('Parse Generated Blog JSON').item.json.focus_keyword || 'Bengaluru urban real estate architecture' }}"
+            },
+            {
+              "name": "per_page",
+              "value": "20"
+            },
+            {
+              "name": "orientation",
+              "value": "landscape"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Client-ID bmfnfQR2DSi7Pumcqs0WujvFN0Ci8eiIjipNFv_pCP0"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "fbdeca16-a5bb-4ab6-9dbe-c182811f6bf2",
+      "name": "Fetch Featured Image (Unsplash)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4460,
+        5904
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const photos = $json.results || [];\nconst publishedRows = $items('Get Already-Published Topics') || [];\n\nconst publishedImageUrls = new Set(\n  publishedRows.map(r => r.json.image_url || '').filter(Boolean)\n);\n\nconst unusedPhotos = photos.filter(p => {\n  const url = p.urls?.regular || p.urls?.full;\n  return url && !publishedImageUrls.has(url);\n});\n\nconst candidatePhotos = unusedPhotos.length > 0 ? unusedPhotos : photos;\nlet selected = candidatePhotos[Math.floor(Math.random() * candidatePhotos.length)];\n\nconst imageUrl = selected?.urls?.regular || \"https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200\";\nconst imageAlt = selected?.alt_description || $('Parse Generated Blog JSON').item.json.image_alt_text || \"Property inspection and vacant site monitoring in Bengaluru\";\n\nreturn [{ json: { image_url: imageUrl, image_alt_text: imageAlt } }];"
+      },
+      "id": "30e7aa1f-c97f-4b67-a318-62a743175de1",
+      "name": "Select Unique Unsplash Image",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4720,
+        5904
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1U6j70q5T3Ewcgxw0hthSXuU43EMU0ZBfkNtRM4ursBU",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "title": "={{ $('Parse Generated Blog JSON').item.json.title }}",
+            "meta_description": "={{ $('Parse Generated Blog JSON').item.json.meta_description }}",
+            "slug": "={{ $('Parse Generated Blog JSON').item.json.slug }}",
+            "focus_keyword": "={{ $('Parse Generated Blog JSON').item.json.focus_keyword }}",
+            "body_html": "={{ $('Parse Generated Blog JSON').item.json.body_html }}",
+            "image_alt_text": "={{ $json.image_alt_text }}",
+            "image_url": "={{ $json.image_url }}",
+            "Date": "={{ new Date().toISOString().split('T')[0] }}",
+            "Status": "Published"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "title",
+              "displayName": "title",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "meta_description",
+              "displayName": "meta_description",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "slug",
+              "displayName": "slug",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "focus_keyword",
+              "displayName": "focus_keyword",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "body_html",
+              "displayName": "body_html",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "image_alt_text",
+              "displayName": "image_alt_text",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "image_url",
+              "displayName": "image_url",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "e87f236b-4e0b-450b-8fb5-a2d7d106c312",
+      "name": "Append to Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        4980,
+        5904
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ohetfj0coOCVrpiz",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Scheduler (Daily 7AM)": {
+      "main": [
+        [
+          {
+            "node": "Search Trending Civic Topics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Trending Civic Topics": {
+      "main": [
+        [
+          {
+            "node": "Convert RSS XML to JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert RSS XML to JSON": {
+      "main": [
+        [
+          {
+            "node": "Get Already-Published Topics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Already-Published Topics": {
+      "main": [
+        [
+          {
+            "node": "Pick First Unpublished Topic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pick First Unpublished Topic": {
+      "main": [
+        [
+          {
+            "node": "DeepSeek Research Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Research Summary": {
+      "main": [
+        [
+          {
+            "node": "Parse Research JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Research JSON": {
+      "main": [
+        [
+          {
+            "node": "Generate SEO Blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate SEO Blog": {
+      "main": [
+        [
+          {
+            "node": "Parse Generated Blog JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Generated Blog JSON": {
+      "main": [
+        [
+          {
+            "node": "Fetch Featured Image (Unsplash)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Featured Image (Unsplash)": {
+      "main": [
+        [
+          {
+            "node": "Select Unique Unsplash Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Unique Unsplash Image": {
+      "main": [
+        [
+          {
+            "node": "Append to Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
