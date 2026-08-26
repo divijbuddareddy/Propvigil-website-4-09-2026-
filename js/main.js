@@ -467,7 +467,17 @@ async function initBlogHub() {
 
   if (!container) return;
 
-  // Load from API or localStorage & Google Sheet sync
+  // 1. Get locally stored blogs (includes latest admin image and content edits)
+  let localBlogs = [];
+  try {
+    const stored = localStorage.getItem('propvigil_blogs_data');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed)) localBlogs = parsed;
+    }
+  } catch (e) {}
+
+  // 2. Fetch server blogs
   let apiBlogs = [];
   try {
     const res = await fetch(getApiUrl('/api/blogs'));
@@ -475,18 +485,41 @@ async function initBlogHub() {
     if (data.success && data.blogs && data.blogs.length > 0) {
       apiBlogs = data.blogs;
     }
-  } catch (e) {
-    const stored = localStorage.getItem('propvigil_blogs_data');
-    if (stored) {
-      try { apiBlogs = JSON.parse(stored); } catch (err) {}
-    }
-  }
+  } catch (e) {}
 
   await fetchGSheetBlogsAsync();
 
+  let deletedSlugs = [];
+  try {
+    const raw = localStorage.getItem('propvigil_deleted_slugs');
+    if (raw) deletedSlugs = JSON.parse(raw);
+  } catch (e) {}
+
   const mergedMap = new Map();
-  apiBlogs.forEach(b => { if (b.slug) mergedMap.set(b.slug, b); });
-  globalBlogsList.forEach(b => { if (b.slug) mergedMap.set(b.slug, b); });
+  // Server blogs first
+  apiBlogs.forEach(b => {
+    const key = b.id || b.slug;
+    if (key && !deletedSlugs.includes(b.slug) && !deletedSlugs.includes(b.id)) {
+      mergedMap.set(key, b);
+    }
+  });
+
+  // Local blogs (including edited image URLs and content) take top precedence
+  localBlogs.forEach(b => {
+    const key = b.id || b.slug;
+    if (key && !deletedSlugs.includes(b.slug) && !deletedSlugs.includes(b.id)) {
+      mergedMap.set(key, b);
+    }
+  });
+
+  // In-memory blogs
+  globalBlogsList.forEach(b => {
+    const key = b.id || b.slug;
+    if (key && !deletedSlugs.includes(b.slug) && !deletedSlugs.includes(b.id)) {
+      mergedMap.set(key, b);
+    }
+  });
+
   globalBlogsList = Array.from(mergedMap.values());
 
   renderBlogGrid();
@@ -541,7 +574,7 @@ function renderBlogGrid() {
   container.innerHTML = filtered.map(item => `
     <article class="blog-card">
       <a href="blog-details.html?slug=${encodeURIComponent(item.slug)}" class="blog-card-thumb-link">
-        <img src="${item.image_url || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80'}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80';" alt="" class="blog-card-img">
+        <img src="${item.image_url || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80'}" alt="${item.image_alt_text || item.title || 'Blog'}" class="blog-card-img" loading="lazy">
       </a>
       <div class="blog-card-body">
         <span class="blog-card-category">${item.category || 'CIVIC GUIDES'}</span>
@@ -570,38 +603,38 @@ async function initBlogDetails() {
   const urlParams = new URLSearchParams(window.location.search);
   const slug = urlParams.get('slug');
 
-  // 1. Fetch from server API if slug is provided
-  let targetArticle = null;
+  // 1. Check localStorage first for latest edited data
+  let localArticle = null;
+  try {
+    const stored = localStorage.getItem('propvigil_blogs_data');
+    if (stored) {
+      const list = JSON.parse(stored);
+      if (Array.isArray(list)) {
+        localArticle = list.find(b => (slug && (b.slug === slug || (b.slug && b.slug.toLowerCase() === slug.toLowerCase()))) || (b.id && b.id === slug));
+      }
+    }
+  } catch (e) {}
+
+  // 2. Fetch from server API if slug is provided
+  let serverArticle = null;
   if (slug) {
     try {
       const res = await fetch(getApiUrl(`/api/blogs/${encodeURIComponent(slug)}`));
       const data = await res.json();
       if (data.success && data.blog) {
-        targetArticle = data.blog;
+        serverArticle = data.blog;
       }
     } catch (e) {}
   }
 
-  // 2. Fetch live from Google Sheets if not yet loaded
+  // 3. Fallback to memory / Google Sheet
+  let targetArticle = localArticle || serverArticle;
+
   if (!targetArticle) {
     await fetchGSheetBlogsAsync();
-    
-    // Check globalBlogsList
     if (slug) {
       targetArticle = globalBlogsList.find(b => b.slug === slug || (b.slug && b.slug.toLowerCase() === slug.toLowerCase()));
     }
-    
-    // Check localStorage
-    if (!targetArticle) {
-      try {
-        const stored = localStorage.getItem('propvigil_blogs_data');
-        if (stored) {
-          const list = JSON.parse(stored);
-          targetArticle = list.find(b => b.slug === slug) || list[0];
-        }
-      } catch (e) {}
-    }
-
     if (!targetArticle && globalBlogsList.length > 0) {
       targetArticle = globalBlogsList[0];
     }
@@ -777,7 +810,7 @@ function parseGoogleSheetCSV(text) {
     } else if ((char === '\r' || char === '\n') && !inQuotes) {
       if (char === '\r' && nextChar === '\n') i++;
       currentRow.push(currentVal);
-      if (currentRow.length > 1 || currentRow[0] !== '') {
+      if (currentRow.length > 1 || (currentRow.length === 1 && currentRow[0].trim() !== '')) {
         rows.push(currentRow);
       }
       currentRow = [];
@@ -788,22 +821,49 @@ function parseGoogleSheetCSV(text) {
   }
   if (currentVal || currentRow.length > 0) {
     currentRow.push(currentVal);
-    if (currentRow.length > 1 || currentRow[0] !== '') rows.push(currentRow);
+    if (currentRow.length > 1 || (currentRow.length === 1 && currentRow[0].trim() !== '')) {
+      rows.push(currentRow);
+    }
   }
 
   if (rows.length < 2) return [];
 
-  const headers = rows[0].map(h => h.toLowerCase().trim());
+  // Clean and normalize header names
+  const rawHeaders = rows[0].map(h => (h || '').trim().replace(/^"+|"+$/g, '').toLowerCase().replace(/[\s\-_]+/g, '_'));
   const result = [];
 
   for (let r = 1; r < rows.length; r++) {
     const row = rows[r];
+    if (!row || row.length === 0) continue;
     const obj = {};
-    for (let c = 0; c < headers.length; c++) {
-      const key = headers[c] || `col_${c}`;
-      obj[key] = row[c] || '';
+    for (let c = 0; c < rawHeaders.length; c++) {
+      const key = rawHeaders[c] || `col_${c}`;
+      obj[key] = (row[c] || '').trim();
     }
-    if (obj.title && obj.title.trim()) result.push(obj);
+
+    const title = obj.title || obj.blog_title || obj.post_title || obj.topic || obj.name || row[0] || '';
+    if (!title || !title.trim()) continue;
+
+    const meta = obj.meta_description || obj.description || obj.summary || obj.excerpt || row[1] || '';
+    const focus = obj.focus_keyword || obj.focus || obj.category || obj.keyword || row[2] || 'CIVIC COMPLIANCE';
+    const slug = obj.slug || obj.url_slug || obj.focus_slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const bodyHtml = obj.body_html || obj.html || obj.content || obj.body || obj.article || `<p>${meta || title}</p>`;
+    const imgAlt = obj.image_alt_text || obj.image_alt || obj.alt_text || obj.alt || '';
+    const imgUrl = obj.image_url || obj.image || obj.img_url || obj.img || obj.photo || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80';
+    const date = obj.date || obj.published_date || obj.issued_date || new Date().toISOString().split('T')[0];
+    const status = obj.status || obj.publish_status || 'Published';
+
+    result.push({
+      title: title.trim(),
+      meta_description: meta.trim(),
+      slug: slug.trim(),
+      focus_keyword: focus.trim().toUpperCase(),
+      body_html: bodyHtml.trim(),
+      image_alt_text: imgAlt.trim(),
+      image_url: imgUrl.trim(),
+      Date: date.trim(),
+      Status: status.trim()
+    });
   }
 
   return result;
@@ -842,36 +902,44 @@ async function fetchGSheetBlogsAsync() {
   }
 
   if (Array.isArray(data) && data.length > 0) {
-    const existingSlugs = new Set(globalBlogsList.map(b => b.slug));
     let newCount = 0;
     data.forEach((row, idx) => {
-      const rawTitle = row.title || 'Untitled Post';
-      const slug = row.slug || rawTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const rawTitle = row.title || row.blog_title || row.post_title || row.topic || 'Untitled Post';
+      const slug = row.slug || row.url_slug || rawTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const lowerSlug = slug ? slug.toLowerCase() : '';
       
-      // Skip deleted blogs
+      // Skip explicitly deleted blogs
       if (deletedSlugs.includes(slug) || deletedSlugs.includes(row.id)) return;
 
-      if (slug && !existingSlugs.has(slug)) {
-        const newBlog = {
-          id: 'blog-gsheet-' + Date.now() + '-' + idx,
-          slug: slug,
-          category: row.focus_keyword ? row.focus_keyword.toUpperCase() : 'CIVIC COMPLIANCE',
-          title: rawTitle,
-          issued_date: row.Date || new Date().toISOString().split('T')[0],
-          author: 'PropVigil Intelligence',
-          read_time: '5 min read',
-          is_published: row.Status ? (row.Status.toString().trim() !== 'Draft') : true,
-          image_url: row.image_url || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200',
-          image_alt_text: row.image_alt_text || '',
-          excerpt: row.meta_description || '',
-          content: row.body_html || `<p>${row.meta_description || ''}</p>`,
-          created_at: new Date().toISOString()
-        };
-        globalBlogsList.unshift(newBlog);
-        existingSlugs.add(slug);
+      const gsheetBlog = {
+        id: row.id || ('blog-gsheet-' + slug),
+        slug: slug,
+        category: (row.focus_keyword || row.category || 'CIVIC COMPLIANCE').toUpperCase(),
+        title: rawTitle,
+        issued_date: row.Date || row.date || row.issued_date || new Date().toISOString().split('T')[0],
+        author: row.author || 'PropVigil Intelligence',
+        read_time: row.read_time || '5 min read',
+        is_published: row.Status ? (row.Status.toString().trim().toLowerCase() !== 'draft') : true,
+        image_url: row.image_url || row.image || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200',
+        image_alt_text: row.image_alt_text || '',
+        excerpt: row.meta_description || row.summary || row.excerpt || '',
+        content: row.body_html || row.content || `<p>${row.meta_description || ''}</p>`,
+        created_at: new Date().toISOString()
+      };
+
+      const existingIdx = globalBlogsList.findIndex(b => (b.slug && b.slug.toLowerCase() === lowerSlug) || (b.id && b.id === gsheetBlog.id));
+
+      if (existingIdx !== -1) {
+        // If not custom edited, keep synced with latest Google Sheet values
+        if (!globalBlogsList[existingIdx].is_custom_edited) {
+          globalBlogsList[existingIdx] = { ...globalBlogsList[existingIdx], ...gsheetBlog };
+        }
+      } else {
+        globalBlogsList.push(gsheetBlog);
         newCount++;
       }
     });
+
     if (newCount > 0) {
       localStorage.setItem('propvigil_blogs_data', JSON.stringify(globalBlogsList));
     }
@@ -903,14 +971,19 @@ async function loadAdminBlogsTable() {
   await fetchGSheetBlogsAsync();
 
   const mergedMap = new Map();
+  // 1. Insert server blogs
   blogs.forEach(b => { 
-    if (b.slug && !deletedSlugs.includes(b.slug) && !deletedSlugs.includes(b.id)) {
-      mergedMap.set(b.slug, b); 
+    const key = b.id || b.slug;
+    if (key && !deletedSlugs.includes(b.slug) && !deletedSlugs.includes(b.id)) {
+      mergedMap.set(key, b); 
     }
   });
+
+  // 2. Insert/override with latest in-memory and custom edited blogs
   globalBlogsList.forEach(b => { 
-    if (b.slug && !deletedSlugs.includes(b.slug) && !deletedSlugs.includes(b.id)) {
-      mergedMap.set(b.slug, b); 
+    const key = b.id || b.slug;
+    if (key && !deletedSlugs.includes(b.slug) && !deletedSlugs.includes(b.id)) {
+      mergedMap.set(key, b); 
     }
   });
 
@@ -989,13 +1062,26 @@ function initAdminBlogModal() {
 
   // Topic Chips
   const topicChips = document.querySelectorAll('.topic-chip-btn');
+  const aiTopicAlert = document.getElementById('aiTopicDuplicateAlert');
+  const aiTopicInputElem = document.getElementById('aiTopicInput');
+
+  if (aiTopicInputElem) {
+    aiTopicInputElem.addEventListener('input', () => {
+      aiTopicInputElem.style.borderColor = '';
+      if (aiTopicAlert) aiTopicAlert.style.display = 'none';
+    });
+  }
+
   topicChips.forEach(chip => {
     chip.addEventListener('click', () => {
       topicChips.forEach(c => c.classList.remove('selected'));
       chip.classList.add('selected');
       const topic = chip.getAttribute('data-topic');
-      const aiInput = document.getElementById('aiTopicInput');
-      if (aiInput) aiInput.value = topic;
+      if (aiTopicInputElem) {
+        aiTopicInputElem.value = topic;
+        aiTopicInputElem.style.borderColor = '';
+      }
+      if (aiTopicAlert) aiTopicAlert.style.display = 'none';
     });
   });
 
@@ -1009,6 +1095,8 @@ function initAdminBlogModal() {
     btnCreate.addEventListener('click', () => {
       if (form) form.reset();
       if (aiForm) aiForm.reset();
+      if (aiTopicAlert) aiTopicAlert.style.display = 'none';
+      if (aiTopicInputElem) aiTopicInputElem.style.borderColor = '';
       document.getElementById('blogFormId').value = '';
       document.getElementById('blogModalTitle').textContent = 'Create Blog Post';
       
@@ -1018,62 +1106,180 @@ function initAdminBlogModal() {
     });
   }
 
-  const closeModal = () => modal.classList.remove('open');
+  const closeModal = () => {
+    modal.classList.remove('open');
+    if (aiTopicAlert) aiTopicAlert.style.display = 'none';
+    if (aiTopicInputElem) aiTopicInputElem.style.borderColor = '';
+  };
   if (btnClose) btnClose.addEventListener('click', closeModal);
   cancelBtns.forEach(btn => btn.addEventListener('click', closeModal));
 
-  // Manual Form Submission
+  // Manual Form Submission (Create or Edit Blog)
   if (form) {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const id = document.getElementById('blogFormId').value;
-      const title = document.getElementById('blogFormTitle').value;
-      const category = document.getElementById('blogFormCategory').value || 'CIVIC COMPLIANCE';
-      const slug = document.getElementById('blogFormSlug').value || title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      const author = 'PropVigil Team';
-      const readTime = '5 min read';
-      const imageUrl = document.getElementById('blogFormImageUrl').value || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80';
-      const excerpt = document.getElementById('blogFormExcerpt').value;
-      const content = document.getElementById('blogFormContent').value;
-      const statusVal = document.getElementById('blogFormStatus').value;
-      const isPublished = statusVal === 'true';
+    const handleBlogSave = async (e) => {
+      if (e) e.preventDefault();
 
-      const payload = {
-        id,
-        title,
-        category,
-        slug,
-        author,
-        read_time: readTime,
-        image_url: imageUrl,
-        excerpt,
-        content,
-        is_published: isPublished,
-        issued_date: new Date().toISOString().split('T')[0]
-      };
+      const saveBtn = document.getElementById('btnSaveBlogPost');
+      const titleInput = document.getElementById('blogFormTitle');
+      const title = titleInput ? titleInput.value.trim() : '';
+
+      if (!title) {
+        showToast('⚠️ Please enter a blog title before saving', 'warning');
+        if (titleInput) {
+          titleInput.style.borderColor = '#EF4444';
+          titleInput.focus();
+        }
+        return;
+      }
+      if (titleInput) titleInput.style.borderColor = '';
+
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+      }
 
       try {
-        const method = id ? 'PUT' : 'POST';
-        await fetch(getApiUrl('/api/admin/blogs'), {
-          method,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-      } catch (e) {}
+        const id = document.getElementById('blogFormId') ? document.getElementById('blogFormId').value.trim() : '';
+        const originalSlug = document.getElementById('blogFormOriginalSlug') ? document.getElementById('blogFormOriginalSlug').value.trim() : '';
+        const category = document.getElementById('blogFormCategory') ? document.getElementById('blogFormCategory').value.trim() || 'CIVIC COMPLIANCE' : 'CIVIC COMPLIANCE';
+        const slug = (document.getElementById('blogFormSlug') && document.getElementById('blogFormSlug').value.trim()) || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        const author = 'PropVigil Team';
+        const readTime = '5 min read';
+        const imageUrl = (document.getElementById('blogFormImageUrl') && document.getElementById('blogFormImageUrl').value.trim()) || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80';
+        const imageAlt = document.getElementById('blogFormImageAlt') ? document.getElementById('blogFormImageAlt').value.trim() : '';
+        const excerpt = document.getElementById('blogFormExcerpt') ? document.getElementById('blogFormExcerpt').value.trim() : '';
+        const content = document.getElementById('blogFormContent') ? document.getElementById('blogFormContent').value.trim() : '';
+        const statusVal = document.getElementById('blogFormStatus') ? document.getElementById('blogFormStatus').value : 'true';
+        const isPublished = statusVal === 'true';
 
-      if (id) {
-        const idx = globalBlogsList.findIndex(b => b.id === id);
-        if (idx !== -1) globalBlogsList[idx] = { ...globalBlogsList[idx], ...payload };
-      } else {
-        payload.id = 'blog-' + Date.now();
-        globalBlogsList.unshift(payload);
+        const isEditMode = Boolean(id || originalSlug);
+
+        // Find existing blog reference if editing
+        let existingBlog = null;
+        if (isEditMode) {
+          existingBlog = globalBlogsList.find(b => (id && b.id === id) || (originalSlug && b.slug === originalSlug) || (slug && b.slug === slug));
+        }
+
+        const blogId = id || (existingBlog ? existingBlog.id : ('blog-' + Date.now()));
+        const issuedDate = existingBlog && existingBlog.issued_date ? existingBlog.issued_date : new Date().toISOString().split('T')[0];
+
+        const payload = {
+          id: blogId,
+          original_slug: originalSlug,
+          title,
+          category,
+          slug,
+          author: existingBlog && existingBlog.author ? existingBlog.author : author,
+          read_time: existingBlog && existingBlog.read_time ? existingBlog.read_time : readTime,
+          image_url: imageUrl,
+          image_alt_text: imageAlt,
+          excerpt,
+          content: content || `<p>${excerpt || title}</p>`,
+          is_published: isPublished,
+          issued_date: issuedDate,
+          is_custom_edited: true
+        };
+
+        // If slug was changed, record old slug in deletedSlugs so Google Sheet sync doesn't restore old version
+        if (originalSlug && originalSlug !== slug) {
+          let deletedSlugs = [];
+          try {
+            const raw = localStorage.getItem('propvigil_deleted_slugs');
+            if (raw) deletedSlugs = JSON.parse(raw);
+          } catch (err) {}
+          if (!deletedSlugs.includes(originalSlug)) {
+            deletedSlugs.push(originalSlug);
+            localStorage.setItem('propvigil_deleted_slugs', JSON.stringify(deletedSlugs));
+          }
+        }
+
+        // Update in-memory globalBlogsList immediately
+        if (isEditMode) {
+          const idx = globalBlogsList.findIndex(b => (blogId && b.id === blogId) || (originalSlug && b.slug === originalSlug) || (slug && b.slug === slug));
+          if (idx !== -1) {
+            globalBlogsList[idx] = { ...globalBlogsList[idx], ...payload };
+          } else {
+            globalBlogsList.unshift(payload);
+          }
+        } else {
+          globalBlogsList.unshift(payload);
+        }
+
+        // Persist to localStorage
+        localStorage.setItem('propvigil_blogs_data', JSON.stringify(globalBlogsList));
+
+        // Persist to backend server API
+        try {
+          const method = isEditMode ? 'PUT' : 'POST';
+          const res = await fetch(getApiUrl('/api/admin/blogs'), {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const resData = await res.json();
+          if (resData.success && resData.blogs) {
+            globalBlogsList = resData.blogs;
+            localStorage.setItem('propvigil_blogs_data', JSON.stringify(globalBlogsList));
+          }
+        } catch (err) {
+          console.log('Server save fallback to local storage:', err);
+        }
+
+        // Direct client Google Sheet webhook sync
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbx1H1eqlB1P4L4oe5QGEuJpaDK1BcyhH7CS7lclBdyYqhPF5g_Fiu8uKP5qNEV2jHwl/exec';
+        try {
+          const sheetPayload = {
+            action: isEditMode ? 'update' : 'create',
+            original_slug: originalSlug || slug,
+            slug: slug,
+            Slug: slug,
+            title: title,
+            Title: title,
+            category: category,
+            focus_keyword: category,
+            'Focus Keyword': category,
+            image_url: imageUrl,
+            'Image URL': imageUrl,
+            image: imageUrl,
+            image_alt_text: imageAlt,
+            'Image Alt Text': imageAlt,
+            meta_description: excerpt,
+            'Meta Description': excerpt,
+            excerpt: excerpt,
+            body_html: content || `<p>${excerpt || title}</p>`,
+            'Body HTML': content || `<p>${excerpt || title}</p>`,
+            content: content || `<p>${excerpt || title}</p>`,
+            Status: isPublished ? 'Published' : 'Draft',
+            status: isPublished ? 'Published' : 'Draft',
+            Date: issuedDate,
+            date: issuedDate
+          };
+
+          fetch(scriptUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(sheetPayload)
+          });
+        } catch (e) {
+          console.log('Google Sheet sync dispatched:', e);
+        }
+
+        closeModal();
+        showToast(isEditMode ? '✓ Blog post updated & synced to Google Sheet!' : '✓ Blog post created & published!');
+        loadAdminBlogsTable();
+      } catch (err) {
+        console.error('Error saving blog:', err);
+        showToast('⚠️ Failed to save blog post. Please check inputs.', 'error');
+      } finally {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.textContent = 'Save Blog Post';
+        }
       }
-      localStorage.setItem('propvigil_blogs_data', JSON.stringify(globalBlogsList));
+    };
 
-      closeModal();
-      showToast(id ? '✓ Blog post updated successfully!' : '✓ Blog post created and published!');
-      loadAdminBlogsTable();
-    });
+    form.addEventListener('submit', handleBlogSave);
   }
 
   // AI Generator Form Submission (Integrated with n8n Webhook & DeepSeek AI)
@@ -1085,15 +1291,34 @@ function initAdminBlogModal() {
       const isPublished = statusVal === 'true';
       const submitBtn = document.getElementById('btnSubmitAiGenerate');
       const submitText = document.getElementById('aiSubmitBtnText');
+      const alertBox = document.getElementById('aiTopicDuplicateAlert');
+      const topicInput = document.getElementById('aiTopicInput');
 
       if (!topic) return;
+
+      // Check if duplicate topic already exists before sending to n8n
+      const existingBlog = findDuplicateBlogTopic(topic);
+      if (existingBlog) {
+        if (alertBox) {
+          alertBox.innerHTML = `⚠️ <strong>Topic Already Exists:</strong> A blog titled <em>"${existingBlog.title}"</em> is already in your dashboard. Please choose a different topic or edit the existing blog.`;
+          alertBox.style.display = 'block';
+        }
+        if (topicInput) {
+          topicInput.style.borderColor = '#EF4444';
+          topicInput.focus();
+        }
+        showToast(`⚠️ Topic already exists: "${existingBlog.title}"`, 'warning');
+        return; // STOP HERE - Do not send request to n8n
+      }
+
+      if (alertBox) alertBox.style.display = 'none';
 
       if (submitBtn && submitText) {
         submitBtn.disabled = true;
         submitText.textContent = 'Triggering n8n DeepSeek AI Generator...';
       }
 
-      const webhookUrl = 'https://propvigil.app.n8n.cloud/webhook/generate-blog';
+      const webhookUrl = 'https://profithax.app.n8n.cloud/webhook/generate-blog';
 
       try {
         // Send request to n8n Webhook
@@ -1158,21 +1383,71 @@ function initAdminBlogModal() {
   }
 }
 
+// Find existing blog with matching or closely similar topic
+function findDuplicateBlogTopic(topic) {
+  if (!topic) return null;
+  const list = Array.isArray(globalBlogsList) ? globalBlogsList : [];
+
+  const cleanStr = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+  const targetClean = cleanStr(topic);
+  const targetSlug = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+  if (!targetClean) return null;
+
+  const targetWords = targetClean.split(' ').filter(w => w.length > 2);
+
+  for (const blog of list) {
+    if (!blog) continue;
+    const blogTitleClean = cleanStr(blog.title);
+    const blogSlug = (blog.slug || '').toLowerCase();
+
+    // 1. Exact match on title or slug
+    if (blogTitleClean === targetClean || blogSlug === targetSlug) {
+      return blog;
+    }
+
+    // 2. Substring containment
+    if (targetClean.length >= 10 && (blogTitleClean.includes(targetClean) || targetClean.includes(blogTitleClean))) {
+      return blog;
+    }
+
+    // 3. Significant keyword overlap (>= 80% words match)
+    if (targetWords.length >= 3) {
+      const matched = targetWords.filter(w => blogTitleClean.includes(w));
+      if (matched.length / targetWords.length >= 0.8) {
+        return blog;
+      }
+    }
+  }
+
+  return null;
+}
+
 function createBlogFromN8nOrFallback(topic, isPublished, n8nData) {
-  if (n8nData && (n8nData.title || n8nData.body_html || n8nData.slug)) {
-    const slug = n8nData.slug || topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  let data = n8nData;
+  if (Array.isArray(data) && data.length > 0) {
+    data = data[0];
+  }
+  if (data && typeof data === 'object') {
+    if (data.data && typeof data.data === 'object') data = data.data;
+    else if (data.blog && typeof data.blog === 'object') data = data.blog;
+  }
+
+  if (data && (data.title || data.body_html || data.content || data.slug || data.meta_description || data.summary)) {
+    const title = data.title || topic;
+    const slug = data.slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     return {
-      id: 'blog-' + Date.now(),
+      id: data.id || 'blog-' + Date.now(),
       slug: slug,
-      title: n8nData.title || topic,
-      category: n8nData.category || 'CIVIC COMPLIANCE',
-      author: 'n8n DeepSeek AI',
-      read_time: '5 min read',
-      issued_date: n8nData.Date || new Date().toISOString().split('T')[0],
-      is_published: isPublished,
-      image_url: n8nData.image_url || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80',
-      excerpt: n8nData.meta_description || n8nData.summary || `SEO Guide on ${topic}`,
-      content: n8nData.body_html || n8nData.content || `<p>${n8nData.meta_description || topic}</p>`,
+      title: title,
+      category: data.category || 'CIVIC COMPLIANCE',
+      author: data.author || 'n8n DeepSeek AI',
+      read_time: data.read_time || '5 min read',
+      issued_date: data.Date || data.date || data.issued_date || new Date().toISOString().split('T')[0],
+      is_published: typeof data.is_published === 'boolean' ? data.is_published : isPublished,
+      image_url: data.image_url || data.imageUrl || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80',
+      excerpt: data.meta_description || data.summary || data.excerpt || `SEO Guide on ${topic}`,
+      content: data.body_html || data.content || `<p>${data.meta_description || data.summary || topic}</p>`,
       created_at: new Date().toISOString()
     };
   }
@@ -1233,10 +1508,11 @@ function generateAiBlogFromTopic(topic, isPublished) {
 }
 
 window.editBlog = function(id) {
-  const blog = globalBlogsList.find(b => b.id === id);
+  const blog = globalBlogsList.find(b => (b.id && b.id === id) || (b.slug && b.slug === id));
   if (!blog) return;
 
   const idEl = document.getElementById('blogFormId');
+  const origSlugEl = document.getElementById('blogFormOriginalSlug');
   const titleEl = document.getElementById('blogFormTitle');
   const slugEl = document.getElementById('blogFormSlug');
   const catEl = document.getElementById('blogFormCategory');
@@ -1247,9 +1523,10 @@ window.editBlog = function(id) {
   const statusEl = document.getElementById('blogFormStatus');
 
   if (idEl) idEl.value = blog.id || '';
+  if (origSlugEl) origSlugEl.value = blog.slug || '';
   if (titleEl) titleEl.value = blog.title || '';
   if (slugEl) slugEl.value = blog.slug || '';
-  if (catEl) catEl.value = blog.category || 'Civic Compliance';
+  if (catEl) catEl.value = blog.category || 'CIVIC COMPLIANCE';
   if (excerptEl) excerptEl.value = blog.excerpt || blog.summary || '';
   if (imgEl) imgEl.value = blog.image_url || '';
   if (altEl) altEl.value = blog.image_alt_text || '';

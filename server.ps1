@@ -186,31 +186,55 @@ function Sync-GoogleSheetBlogs {
                     $lines = $csvText -split "`r?`n"
                     if ($lines.Length -gt 1) {
                         $parsedList = [System.Collections.ArrayList]@()
-                        # Parse CSV lines
                         $csvRows = $csvText | ConvertFrom-Csv
                         foreach ($r in $csvRows) {
                             $propNames = $r.PSObject.Properties | ForEach-Object { $_.Name }
-                            $titleVal = if ($r.title) { $r.title } else { $r.($propNames[0]) }
-                            $metaVal = if ($r.meta_description) { $r.meta_description } else { $r.($propNames[1]) }
-                            $slugVal = if ($r.slug) { $r.slug } else { $r.($propNames[3]) }
-                            $focusVal = if ($r.focus_keyword) { $r.focus_keyword } else { $r.($propNames[4]) }
-                            $bodyVal = if ($r.body_html) { $r.body_html } else { $r.($propNames[5]) }
-                            $altVal = if ($r.image_alt_text) { $r.image_alt_text } else { $r.($propNames[6]) }
-                            $imgVal = if ($r.image_url) { $r.image_url } else { $r.($propNames[7]) }
-                            $dateVal = if ($r.Date) { $r.Date } else { $r.($propNames[8]) }
-                            $statusVal = if ($r.Status) { $r.Status } else { $r.($propNames[9]) }
+                            if ($propNames.Count -eq 0) { continue }
+
+                            $getVal = {
+                                param($targets)
+                                foreach ($p in $propNames) {
+                                    $cleanP = [System.Text.RegularExpressions.Regex]::Replace($p.ToLower().Trim(), "[\s_-]+", "")
+                                    foreach ($t in $targets) {
+                                        $cleanT = [System.Text.RegularExpressions.Regex]::Replace($t.ToLower().Trim(), "[\s_-]+", "")
+                                        if ($cleanP -eq $cleanT -and $r.$p) {
+                                            return $r.$p.ToString().Trim()
+                                        }
+                                    }
+                                }
+                                return ""
+                            }
+
+                            $titleVal = & $getVal @("title", "blogtitle", "posttitle", "topic", "name")
+                            if (-not $titleVal -and $propNames.Count -gt 0) { $titleVal = $r.($propNames[0]) }
+
+                            $metaVal = & $getVal @("metadescription", "meta", "description", "summary", "excerpt")
+                            $slugVal = & $getVal @("slug", "urlslug", "focusslug")
+                            if (-not $slugVal -and $titleVal) {
+                                $slugVal = [System.Text.RegularExpressions.Regex]::Replace($titleVal.ToLower(), "[^a-z0-9]+", "-").Trim('-')
+                            }
+                            $focusVal = & $getVal @("focuskeyword", "category", "focus", "keyword")
+                            if (-not $focusVal) { $focusVal = "CIVIC COMPLIANCE" }
+                            $bodyVal = & $getVal @("bodyhtml", "content", "body", "html", "article")
+                            $altVal = & $getVal @("imagealttext", "imagealt", "alttext", "alt")
+                            $imgVal = & $getVal @("imageurl", "image", "imgurl", "img", "photo", "thumbnail")
+                            if (-not $imgVal) { $imgVal = "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80" }
+                            $dateVal = & $getVal @("date", "issueddate", "publisheddate")
+                            if (-not $dateVal) { $dateVal = (Get-Date -Format "yyyy-MM-dd") }
+                            $statusVal = & $getVal @("status", "publishstatus", "state")
+                            if (-not $statusVal) { $statusVal = "Published" }
 
                             if ($titleVal -and $titleVal.Trim()) {
                                 $parsedList.Add([ordered]@{
                                     title = $titleVal.Trim()
                                     meta_description = if ($metaVal) { $metaVal.Trim() } else { "" }
                                     slug = if ($slugVal) { $slugVal.Trim() } else { [System.Text.RegularExpressions.Regex]::Replace($titleVal.ToLower(), "[^a-z0-9]+", "-").Trim('-') }
-                                    focus_keyword = if ($focusVal) { $focusVal.Trim() } else { "CIVIC COMPLIANCE" }
-                                    body_html = if ($bodyVal) { $bodyVal.Trim() } else { "" }
+                                    focus_keyword = $focusVal.ToUpper()
+                                    body_html = if ($bodyVal) { $bodyVal.Trim() } else { "<p>$metaVal</p>" }
                                     image_alt_text = if ($altVal) { $altVal.Trim() } else { "" }
-                                    image_url = if ($imgVal) { $imgVal.Trim() } else { "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200" }
-                                    Date = if ($dateVal) { $dateVal.Trim() } else { (Get-Date -Format "yyyy-MM-dd") }
-                                    Status = if ($statusVal) { $statusVal.Trim() } else { "Published" }
+                                    image_url = $imgVal
+                                    Date = $dateVal
+                                    Status = $statusVal
                                 }) | Out-Null
                             }
                         }
@@ -224,7 +248,7 @@ function Sync-GoogleSheetBlogs {
             $blogs = Get-Blogs
             $existingSlugs = @{}
             foreach ($b in $blogs) {
-                if ($b.slug) { $existingSlugs[$b.slug] = $true }
+                if ($b.slug) { $existingSlugs[$b.slug.ToLower()] = $true }
             }
 
             $deletedSlugs = Get-DeletedSlugs
@@ -233,13 +257,14 @@ function Sync-GoogleSheetBlogs {
             foreach ($row in $gsRows) {
                 $rawTitle = if ($row.title) { $row.title } else { "Untitled Post" }
                 $slug = if ($row.slug) { $row.slug } else { [System.Text.RegularExpressions.Regex]::Replace($rawTitle.ToLower(), "[^a-z0-9]+", "-").Trim('-') }
+                $lowerSlug = if ($slug) { $slug.ToLower() } else { "" }
                 
-                if ($slug -and -not $existingSlugs.ContainsKey($slug) -and -not ($deletedSlugs -contains $slug)) {
+                if ($slug -and -not $existingSlugs.ContainsKey($lowerSlug) -and -not ($deletedSlugs -contains $slug)) {
                     $catVal = if ($row.focus_keyword) { $row.focus_keyword.ToUpper() } else { "CIVIC COMPLIANCE" }
                     $imgVal = if ($row.image_url) { $row.image_url } else { "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80" }
                     $excerptVal = if ($row.meta_description) { $row.meta_description } else { "" }
                     $contentVal = if ($row.body_html) { $row.body_html } else { "<p>$excerptVal</p>" }
-                    $isPub = if ($null -ne $row.Status) { ($row.Status.ToString().Trim() -ne "Draft") } else { $true }
+                    $isPub = if ($null -ne $row.Status) { ($row.Status.ToString().Trim().ToLower() -ne "draft") } else { $true }
                     $dateVal = if ($row.Date) { $row.Date.ToString().Trim() } else { (Get-Date -Format "yyyy-MM-dd") }
 
                     $newBlog = [ordered]@{
@@ -258,7 +283,7 @@ function Sync-GoogleSheetBlogs {
                         created_at = (Get-Date).ToString("o")
                     }
                     $blogs.Add($newBlog) | Out-Null
-                    $existingSlugs[$slug] = $true
+                    $existingSlugs[$lowerSlug] = $true
                     $added = $true
                 }
             }
@@ -693,6 +718,18 @@ try {
                     $newId = "blog-" + [System.Guid]::NewGuid().ToString().Substring(0, 8)
                     $titleVal = if ($body.title) { $body.title } else { if ($body.topic) { $body.topic } else { "Untitled AI Blog" } }
                     $slugVal = if ($body.slug) { $body.slug } else { [System.Text.RegularExpressions.Regex]::Replace($titleVal.ToLower(), "[^a-z0-9]+", "-") }
+
+                    # Duplicate check: check existing slug and title
+                    $existing = $blogs | Where-Object { 
+                        ($_.slug -and $_.slug.ToLower() -eq $slugVal.ToLower()) -or 
+                        ($_.title -and $_.title.Trim().ToLower() -eq $titleVal.Trim().ToLower()) 
+                    }
+                    if ($existing) {
+                        Write-Host " [N8N WEBHOOK] Duplicate topic skipped: '$titleVal'" -ForegroundColor Yellow
+                        Write-JsonResponse $response 200 @{ success = $true; duplicate = $true; message = "Topic already exists"; existing_slug = $existing[0].slug; existing_title = $existing[0].title }
+                        continue
+                    }
+
                     $contentVal = if ($body.body_html) { $body.body_html } else { if ($body.content) { $body.content } else { "" } }
                     $excerptVal = if ($body.meta_description) { $body.meta_description } else { if ($body.summary) { $body.summary } else { if ($body.excerpt) { $body.excerpt } else { "" } } }
                     $imgVal = if ($body.image_url) { $body.image_url } else { "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80" }
@@ -803,7 +840,7 @@ try {
                     $reader = New-Object System.IO.StreamReader($request.InputStream, $request.ContentEncoding)
                     $bodyStr = $reader.ReadToEnd()
                     $body = if ($bodyStr) { $bodyStr | ConvertFrom-Json } else { $null }
-                    if (-not $body -or -not $body.id) {
+                    if (-not $body) {
                         Write-JsonResponse $response 400 @{ success = $false; message = "Invalid request payload" }
                         continue
                     }
@@ -811,9 +848,14 @@ try {
                     $blogs = Get-Blogs
                     $updatedBlogs = [System.Collections.ArrayList]@()
                     $found = $false
+                    $updatedTarget = $null
 
                     foreach ($item in $blogs) {
-                        if ($item.id -eq $body.id) {
+                        $matchId = if ($body.id -and $item.id) { $item.id -eq $body.id } else { $false }
+                        $matchOrigSlug = if ($body.original_slug -and $item.slug) { $item.slug.ToLower() -eq $body.original_slug.ToLower() } else { $false }
+                        $matchSlug = if ($body.slug -and $item.slug) { $item.slug.ToLower() -eq $body.slug.ToLower() } else { $false }
+
+                        if ($matchId -or $matchOrigSlug -or $matchSlug) {
                             $found = $true
                             if ($null -ne $body.title) { $item.title = $body.title }
                             if ($null -ne $body.slug) { $item.slug = $body.slug }
@@ -825,6 +867,7 @@ try {
                             if ($null -ne $body.excerpt) { $item.excerpt = $body.excerpt }
                             if ($null -ne $body.content) { $item.content = $body.content }
                             if ($null -ne $body.image_url) { $item.image_url = $body.image_url }
+                            if ($null -ne $body.image_alt_text) { $item.image_alt_text = $body.image_alt_text }
 
                             if ($body.image_data -and $body.image_name) {
                                 $cleanName = [System.Text.RegularExpressions.Regex]::Replace($body.image_name, "[^a-zA-Z0-9_\.-]", "_")
@@ -833,16 +876,82 @@ try {
                                 [System.IO.File]::WriteAllBytes($savePath, $bytes)
                                 $item.image_url = "uploads/blogs/$($item.id)`_$cleanName"
                             }
+                            $updatedTarget = $item
                         }
                         $updatedBlogs.Add($item) | Out-Null
                     }
 
-                    if ($found) {
-                        Save-Blogs $updatedBlogs
-                        Write-JsonResponse $response 200 @{ success = $true; message = "Blog post updated" }
-                    } else {
-                        Write-JsonResponse $response 404 @{ success = $false; message = "Blog ID not found" }
+                    if (-not $found) {
+                        $targetId = if ($body.id) { $body.id } else { "blog-" + [System.Guid]::NewGuid().ToString().Substring(0, 8) }
+                        $newItem = [ordered]@{
+                            id = $targetId
+                            slug = if ($body.slug) { $body.slug } else { "blog-$targetId" }
+                            category = if ($body.category) { $body.category } else { "CIVIC COMPLIANCE" }
+                            title = if ($body.title) { $body.title } else { "Untitled Blog Post" }
+                            issued_date = if ($body.issued_date) { $body.issued_date } else { (Get-Date -Format "yyyy-MM-dd") }
+                            author = if ($body.author) { $body.author } else { "PropVigil Team" }
+                            read_time = if ($body.read_time) { $body.read_time } else { "5 min read" }
+                            is_published = if ($null -ne $body.is_published) { [bool]$body.is_published } else { $true }
+                            image_url = if ($body.image_url) { $body.image_url } else { "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80" }
+                            image_alt_text = if ($body.image_alt_text) { $body.image_alt_text } else { "" }
+                            excerpt = if ($body.excerpt) { $body.excerpt } else { "" }
+                            content = if ($body.content) { $body.content } else { "" }
+                            created_at = (Get-Date).ToString("o")
+                        }
+                        $updatedBlogs.Add($newItem) | Out-Null
+                        $updatedTarget = $newItem
                     }
+
+                    Save-Blogs $updatedBlogs
+
+                    # Send update action to Google Apps Script Web App
+                    $scriptUrl = "https://script.google.com/macros/s/AKfycbx1H1eqlB1P4L4oe5QGEuJpaDK1BcyhH7CS7lclBdyYqhPF5g_Fiu8uKP5qNEV2jHwl/exec"
+                    try {
+                        $origSlug = if ($body.original_slug) { $body.original_slug } else { $body.slug }
+                        $updatePayload = [ordered]@{
+                            action = "update"
+                            original_slug = $origSlug
+                            slug = $body.slug
+                            Slug = $body.slug
+                            title = $body.title
+                            Title = $body.title
+                            category = $body.category
+                            focus_keyword = $body.category
+                            "Focus Keyword" = $body.category
+                            image_url = $body.image_url
+                            "Image URL" = $body.image_url
+                            image = $body.image_url
+                            image_alt_text = if ($body.image_alt_text) { $body.image_alt_text } else { "" }
+                            "Image Alt Text" = if ($body.image_alt_text) { $body.image_alt_text } else { "" }
+                            meta_description = $body.excerpt
+                            "Meta Description" = $body.excerpt
+                            excerpt = $body.excerpt
+                            body_html = $body.content
+                            "Body HTML" = $body.content
+                            content = $body.content
+                            Status = if ($body.is_published -eq $false) { "Draft" } else { "Published" }
+                            status = if ($body.is_published -eq $false) { "Draft" } else { "Published" }
+                            Date = $body.issued_date
+                            date = $body.issued_date
+                        } | ConvertTo-Json
+                        $req = [System.Net.HttpWebRequest]::Create($scriptUrl)
+                        $req.Method = "POST"
+                        $req.ContentType = "application/json; charset=utf-8"
+                        $req.Timeout = 5000
+                        $req.AllowAutoRedirect = $true
+                        $bytes = [System.Text.Encoding]::UTF8.GetBytes($updatePayload)
+                        $req.ContentLength = $bytes.Length
+                        $st = $req.GetRequestStream()
+                        $st.Write($bytes, 0, $bytes.Length)
+                        $st.Close()
+                        $resp = $req.GetResponse()
+                        $resp.Close()
+                        Write-Host " [GSHEET UPDATE] Synced edited blog post with Google Sheet for slug: '$($body.slug)'" -ForegroundColor Green
+                    } catch {
+                        Write-Host " [GSHEET UPDATE] Note: Google Sheet webhook update attempted" -ForegroundColor Yellow
+                    }
+
+                    Write-JsonResponse $response 200 @{ success = $true; message = "Blog post updated"; blog = $updatedTarget; blogs = $updatedBlogs }
                     continue
                 }
 

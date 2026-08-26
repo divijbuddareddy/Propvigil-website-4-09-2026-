@@ -1699,6 +1699,12 @@ table.plain-data-table tr:nth-child(even) {
   border: 1px solid #EF4444;
 }
 
+.toast-feedback.warning {
+  background: rgba(245, 158, 11, 0.14);
+  color: #92400E;
+  border: 1px solid #F59E0B;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }

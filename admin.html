@@ -208,8 +208,9 @@
       <div id="manualBlogView">
         <h3 style="font-size: 1.15rem; font-weight: 800; color: #0284C7; margin-bottom: 20px;">Create / Edit Blog Post Details</h3>
         
-        <form id="blogForm">
+        <form id="blogForm" novalidate>
           <input type="hidden" id="blogFormId">
+          <input type="hidden" id="blogFormOriginalSlug">
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
             <div>
@@ -244,7 +245,7 @@
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
             <div>
               <label class="admin-form-label">Image URL *</label>
-              <input type="url" id="blogFormImageUrl" class="admin-form-input" placeholder="https://..." required value="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80">
+              <input type="text" id="blogFormImageUrl" class="admin-form-input" placeholder="https://..." value="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80">
             </div>
             <div>
               <label class="admin-form-label">Image Alt Text</label>
@@ -254,12 +255,12 @@
 
           <div style="margin-bottom: 24px;">
             <label class="admin-form-label">Content (HTML supported) *</label>
-            <textarea id="blogFormContent" class="admin-form-input" rows="8" placeholder="<p>Write your blog content here...</p>" required></textarea>
+            <textarea id="blogFormContent" class="admin-form-input" rows="8" placeholder="<p>Write your blog content here...</p>"></textarea>
           </div>
 
           <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #E2E8F0; padding-top: 20px;">
             <button type="button" class="btn-modal-outline cancelBlogModalBtn">Cancel</button>
-            <button type="submit" class="btn-create-post" style="padding: 12px 28px;">Save Blog Post</button>
+            <button type="submit" id="btnSaveBlogPost" class="btn-create-post" style="padding: 12px 28px;">Save Blog Post</button>
           </div>
         </form>
       </div>
@@ -282,6 +283,8 @@
           <div style="margin-bottom: 20px;">
             <label class="admin-form-label">Enter Topic or Keyword *</label>
             <input type="text" id="aiTopicInput" class="admin-form-input" placeholder="e.g. BBMP e-Khata Digital Verification Process for NRIs in Bangalore" required>
+            <div id="aiTopicDuplicateAlert" style="display: none; margin-top: 8px; padding: 10px 14px; background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 8px; color: #92400E; font-size: 0.88rem; font-weight: 600; line-height: 1.4;">
+            </div>
           </div>
 
           <div style="margin-bottom: 20px;">
