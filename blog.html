@@ -59,21 +59,68 @@
 
   </main>
 
-  <!-- Footer -->
-  <footer style="background: #090D16; color: #94A3B8; padding: 60px 20px 30px; border-top: 1px solid rgba(255,255,255,0.08);">
-    <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; padding-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <a href="index.html">
-        <img src="assets/logo.svg" alt="PropVigil" style="height: 40px;">
-      </a>
-      <p style="font-size: 0.9rem;">Empowering property owners with geotagged physical intelligence in Bengaluru.</p>
-      <div>
-        <a href="admin.html" style="color: #38BDF8; font-weight: 700; text-decoration: none; font-size: 0.9rem;">Admin Portal Login →</a>
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="brand-logo" style="display: inline-block; margin-bottom: 8px;">
+            <img src="assets/logo-white.svg" alt="PropVigil Logo" style="height: 48px; width: auto; display: block;">
+          </a>
+          <p>Monitor, Maintain, and Report: Trusted Property Care for NRI and outstation owners in Bengaluru.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="index.html#what-we-do">What we do</a></li>
+            <li><a href="index.html#how-it-works">How it works</a></li>
+            <li><a href="index.html#the-report">Your report</a></li>
+            <li><a href="pricing.html">What's included</a></li>
+            <li><a href="civic-updates.html">Civic updates</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Property Types</h4>
+          <ul class="footer-links">
+            <li><a href="index.html#what-we-do">Vacant land or site</a></li>
+            <li><a href="index.html#what-we-do">Unoccupied flat</a></li>
+            <li><a href="index.html#what-we-do">Rented flat</a></li>
+            <li><a href="index.html#what-we-do">Inherited property</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Contact Us</h4>
+          <p style="color: #F1F5F9; font-size: 0.95rem; font-weight: 700; margin-bottom: 8px;">V P Srinivasa, Founder</p>
+          <p style="margin-bottom: 8px;"><a href="tel:+919242143775" style="color: var(--brand-gold); font-weight: 800; font-size: 1.15rem;">+91 92421 43775</a></p>
+          <p style="color: #94A3B8; font-size: 0.9rem; margin-bottom: 6px;"><a href="mailto:saikrupaassociates@gmail.com" style="color: #94A3B8;">saikrupaassociates@gmail.com</a></p>
+          <p style="color: #94A3B8; font-size: 0.9rem;">Based in Bengaluru</p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2026 PropVigil (A unit of Sai Krupa Associates). All Rights Reserved.</p>
+        <p style="display: flex; gap: 10px; align-items: center;">
+          <span>Bengaluru · We do not take Power of Attorney</span>
+          <span style="opacity: 0.4;">·</span>
+          <a href="admin.html" style="color: #64748B; font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; transition: color 0.2s;" onmouseover="this.style.color='var(--brand-gold)'" onmouseout="this.style.color='#64748B'">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            Portal Login
+          </a>
+        </p>
       </div>
     </div>
-    <div style="max-width: 1200px; margin: 20px auto 0; text-align: center; font-size: 0.85rem; color: #64748B;">
-      &copy; 2026 PropVigil by Sai Krupa Associates. All rights reserved.
-    </div>
   </footer>
+
+  <!-- Floating WhatsApp FAB -->
+  <a href="https://wa.me/919242143775" target="_blank" class="floating-whatsapp-fab" aria-label="Chat on WhatsApp">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.76.459 3.478 1.333 4.992l-1.417 5.177 5.297-1.389c1.455.794 3.09 1.21 4.773 1.211h.004c5.505 0 9.988-4.478 9.989-9.985 0-2.669-1.038-5.177-2.925-7.063a9.924 9.924 0 0 0-7.063-2.927zm5.952 14.168c-.252.632-1.464 1.208-2.016 1.282-.511.069-1.168.106-3.376-.807-2.825-1.168-4.63-4.041-4.77-4.227-.14-.186-1.141-1.517-1.141-2.894 0-1.376.721-2.052.977-2.331.256-.279.559-.349.746-.349.186 0 .372.002.535.01.173.008.406-.066.634.482.233.56.791 1.93.86 2.07.07.14.116.302.023.488-.093.186-.14.302-.279.465-.14.163-.293.364-.419.488-.14.14-.286.293-.123.573.163.279.722 1.191 1.551 1.93 1.066.95 1.966 1.244 2.245 1.384.279.14.442.116.605-.07.163-.186.7-0.814.886-1.093.186-.279.372-.233.628-.14.256.093 1.629.768 1.908.907.279.14.465.209.535.326.07.116.07.674-.182 1.306z"/>
+    </svg>
+  </a>
 
   <script src="js/main.js"></script>
 </body>
