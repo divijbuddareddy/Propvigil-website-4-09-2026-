@@ -437,44 +437,222 @@ a:hover {
   animation: pulseDot 2s infinite;
 }
 
-/* Stats Counter Strip */
-.stats-counter-strip {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-  margin-top: 64px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-lg);
-  padding: 36px;
-  box-shadow: var(--shadow-md);
+/* Reviews Block (Replaces Stats Counter Strip - A1) */
+.reviews-block {
+  margin-top: 48px;
 }
 
-.stat-box {
-  text-align: center;
-  padding: 12px;
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.review-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-top: 3px solid var(--brand-gold);
   border-radius: var(--radius-md);
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
   transition: var(--transition);
 }
 
-.stat-box:hover {
-  background: var(--gold-light);
+.review-card:hover {
   transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-gold);
 }
 
-.stat-number {
-  font-size: 2.6rem;
-  font-weight: 800;
-  color: var(--brand-navy);
-  font-family: 'Space Grotesk', 'Outfit', sans-serif;
-  line-height: 1.1;
-  margin-bottom: 6px;
+.review-stars {
+  display: flex;
+  gap: 4px;
+  color: #C9A227;
+  font-size: 1.15rem;
+  margin-bottom: 14px;
+  line-height: 1;
 }
 
-.stat-label {
-  font-size: 0.88rem;
-  color: var(--text-muted);
+.review-text {
+  font-size: 0.98rem;
+  color: var(--text-heading);
+  line-height: 1.65;
+  margin-bottom: 20px;
   font-weight: 500;
+  flex-grow: 1;
+}
+
+.review-attribution {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  border-top: 1px solid var(--border-light);
+  padding-top: 12px;
+  margin-top: auto;
+  line-height: 1.4;
+}
+
+/* Cleaning is part of the plan section (A2) */
+.cleaning-plan-card {
+  background: #FFFFFF;
+  border: 1.5px solid var(--border-gold);
+  border-radius: var(--radius-lg);
+  padding: 44px 40px;
+  box-shadow: var(--shadow-md);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.cleaning-plan-title {
+  font-size: 2.2rem;
+  color: var(--brand-navy);
+  margin-bottom: 20px;
+  letter-spacing: -0.02em;
+}
+
+.cleaning-plan-body p {
+  font-size: 1.08rem;
+  line-height: 1.75;
+  color: var(--text-heading);
+  margin-bottom: 16px;
+}
+
+.cleaning-plan-body p:last-of-type {
+  margin-bottom: 28px;
+}
+
+/* What's Included Page Layout & Styling (A8) */
+.whats-included-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 40px;
+}
+
+.included-column-card {
+  background: #FFFFFF;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 36px 32px;
+  box-shadow: var(--shadow-sm);
+}
+
+.included-column-card.primary-plan {
+  border: 1.5px solid var(--brand-gold);
+  background: #FCFBF8;
+}
+
+.included-column-card h3 {
+  font-size: 1.45rem;
+  color: var(--brand-navy);
+  margin-bottom: 22px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--border-gold);
+}
+
+.included-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0;
+  margin: 0;
+}
+
+.included-list li {
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  color: var(--text-heading);
+  background: #FFFFFF;
+  border: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.included-list li::before {
+  content: '✓';
+  color: #10B981;
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.included-list.quoted-list li::before {
+  content: '•';
+  color: var(--brand-gold);
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+
+
+.quote-single-note {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--brand-navy);
+  text-align: center;
+  padding: 16px 20px;
+  background: var(--gold-light);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-md);
+  margin-bottom: 44px;
+}
+
+.price-change-card {
+  background: #FFFFFF;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 32px;
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.price-change-card h3 {
+  font-size: 1.35rem;
+  color: var(--brand-navy);
+  margin-bottom: 12px;
+}
+
+.price-change-points {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.no-rate-card-box {
+  background: var(--brand-navy);
+  color: #FFFFFF;
+  border-radius: var(--radius-lg);
+  padding: 44px 36px;
+  text-align: center;
+  border: 2px solid var(--border-gold);
+}
+
+.no-rate-card-box h3 {
+  color: var(--brand-gold);
+  font-size: 1.85rem;
+  margin-bottom: 14px;
+}
+
+.no-rate-card-box p {
+  font-size: 1.1rem;
+  max-width: 680px;
+  margin: 0 auto 28px auto;
+  color: #F8FAFC;
+  line-height: 1.65;
+}
+
+@media (max-width: 900px) {
+  .reviews-grid {
+    grid-template-columns: 1fr;
+  }
+  .whats-included-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ==========================================================================

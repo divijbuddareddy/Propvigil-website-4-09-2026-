@@ -912,26 +912,16 @@ try {
                             action = "update"
                             original_slug = $origSlug
                             slug = $body.slug
-                            Slug = $body.slug
                             title = $body.title
-                            Title = $body.title
                             category = $body.category
                             focus_keyword = $body.category
-                            "Focus Keyword" = $body.category
                             image_url = $body.image_url
-                            "Image URL" = $body.image_url
-                            image = $body.image_url
                             image_alt_text = if ($body.image_alt_text) { $body.image_alt_text } else { "" }
-                            "Image Alt Text" = if ($body.image_alt_text) { $body.image_alt_text } else { "" }
                             meta_description = $body.excerpt
-                            "Meta Description" = $body.excerpt
                             excerpt = $body.excerpt
                             body_html = $body.content
-                            "Body HTML" = $body.content
                             content = $body.content
-                            Status = if ($body.is_published -eq $false) { "Draft" } else { "Published" }
                             status = if ($body.is_published -eq $false) { "Draft" } else { "Published" }
-                            Date = $body.issued_date
                             date = $body.issued_date
                         } | ConvertTo-Json
                         $req = [System.Net.HttpWebRequest]::Create($scriptUrl)

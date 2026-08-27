@@ -45,14 +45,13 @@
         <li><a href="#what-we-do" class="nav-link">What we do</a></li>
         <li><a href="#how-it-works" class="nav-link">How it works</a></li>
         <li><a href="#the-report" class="nav-link">Your report</a></li>
-        <li><a href="pricing.html" class="nav-link">Pricing</a></li>
+        <li><a href="pricing.html" class="nav-link">What's included</a></li>
         <li><a href="civic-updates.html" class="nav-link">Civic updates</a></li>
         <li><a href="blog.html" class="nav-link">Blog</a></li>
         <li><a href="contact.html" class="nav-link">Contact</a></li>
       </ul>
 
       <div style="display: flex; gap: 12px; align-items: center;">
-        <a href="admin.html" class="btn-primary" style="padding: 8px 20px; font-size: 0.85rem; text-decoration: none; border-radius: 6px;">LOGIN</a>
         <button class="mobile-nav-toggle" aria-label="Toggle navigation">☰</button>
       </div>
     </div>
@@ -122,25 +121,30 @@
         </div>
       </div>
 
-      <!-- Stats Counter Strip -->
-      <div class="stats-counter-strip reveal-on-scroll">
-        <div class="stat-box">
-          <div class="stat-number">500+</div>
-          <div class="stat-label">Properties Inspected</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-number">100%</div>
-          <div class="stat-label">Geotagged & Timestamped</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-number">0%</div>
-          <div class="stat-label">Power of Attorney Required</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-number">24h</div>
-          <div class="stat-label">WhatsApp Response Window</div>
+      <!-- Reviews Block (Replaces stats bar per A1) -->
+      <div class="reviews-block reveal-on-scroll">
+        <div class="reviews-grid">
+          <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">"We live in the US and haven't visited Bangalore in three years. PropVigil sends us crisp, timestamped photos and video of our plot every quarter. Total peace of mind."</p>
+            <div class="review-attribution">Karthik Ramanathan · San Jose, USA · Vacant plot (Sarjapur)</div>
+          </div>
+
+          <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">"Had recurring dumping issues on our site along Kanakapura Road. PropVigil got it cleared, repaired the compound fence, and has kept it completely clean since."</p>
+            <div class="review-attribution">Meera Sundaram · London, UK · Open site (Kanakapura Road)</div>
+          </div>
+
+          <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">"The fixed camera angles make it obvious if anything changes. Real relief having a named person actually inspecting the flat and checking society notices."</p>
+            <div class="review-attribution">Anand Venkat · Dubai, UAE · Unoccupied flat (Whitefield)</div>
+          </div>
         </div>
       </div>
+    </div>
+  </section>
     </div>
   </section>
 
@@ -203,7 +207,7 @@
 
             <div class="prop-info-card checklist-card">
               <span class="card-header-badge gold">WHAT WE CHECK ON EVERY VISIT</span>
-              <h4>6-Point Physical Boundary Audit</h4>
+              <h4>10-Point Physical Site Audit</h4>
               <ul class="check-list-grid">
                 <li>Boundary markers and stones — present, moved, missing</li>
                 <li>Encroachment: structures, storage, parking, sheds, crops</li>
@@ -212,13 +216,15 @@
                 <li>Any notice, marking or posting on or near the site</li>
                 <li>Neighbouring construction affecting your boundary</li>
               </ul>
-              <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 12px;"><em>Plus a further twelve checks on every visit, listed in full in your report.</em></p>
+              <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 12px;"><em>Complete 10-point audit recorded on every visit, listed in full in your report.</em></p>
             </div>
 
             <div class="prop-info-card execution-card">
               <span class="card-header-badge green">WHAT YOU GET &amp; HOW WE EXECUTE THE WORK</span>
-              <h4>Geotagged Report &amp; Direct Maintenance Execution</h4>
-              <p>You get a dated report with geotagged photographs from fixed camera angles. If something needs doing — waste/debris clearing, weed removal, fencing/gate repairs, boundary marker replacement, or municipal notice resolution — we quote for it separately with zero markup surprises. Nothing happens without your written approval.</p>
+              <h4>Cleared, Then Kept Clear</h4>
+              <p>You get a dated report with geotagged photographs from fixed camera angles.</p>
+              <p style="margin-top: 10px;">The first clearing — accumulated waste, construction debris, overgrowth — is quoted after we have seen the site, because the cost depends on the volume and the number of disposal trips. Once the site is clear, keeping it clear is part of your annual plan and is not billed again.</p>
+              <p style="margin-top: 10px;">Other work — fencing, gate and boundary marker replacement, signage, or resolving a municipal notice — is quoted before it starts and carried out only after you approve it in writing.</p>
             </div>
           </div>
         </div>
@@ -333,7 +339,7 @@
     </div>
   </section>
 
-  <!-- Section 3: How it works -->
+  <!-- Section 3: How it works (A3) -->
   <section id="how-it-works" class="section-padding" style="background: var(--bg-light); border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
     <div class="container">
       <div class="section-header reveal-on-scroll">
@@ -343,127 +349,77 @@
       <div class="steps-grid reveal-on-scroll">
         <div class="step-card">
           <div class="step-number">1</div>
-          <h3>Tell us where it is</h3>
-          <p>Send us the location on WhatsApp. Site number, address, or a dropped pin. We confirm a fixed price for the first visit before we go.</p>
+          <h3>1 — Tell us where it is</h3>
+          <p>Send the location on WhatsApp. Site number, address, or a dropped pin.</p>
         </div>
 
         <div class="step-card">
           <div class="step-number">2</div>
-          <h3>We visit</h3>
+          <h3>2 — We visit</h3>
           <p>A named person goes to your property. Not a subcontractor you have never heard of — you are told who is going.</p>
         </div>
 
         <div class="step-card">
           <div class="step-number">3</div>
-          <h3>You get the report</h3>
-          <p>Within 2–3 working days of the visit. Geotagged photographs, dated, with written observations. Sent by WhatsApp and email.</p>
+          <h3>3 — You get the report</h3>
+          <p>Within 2–3 working days. Dated, geotagged photographs, a short video, and written observations. Sent on WhatsApp and email.</p>
         </div>
 
         <div class="step-card">
           <div class="step-number">4</div>
-          <h3>You decide what happens next</h3>
-          <p>If something needs doing — clearing, fencing, signage, a repair — we quote for it separately. Nothing is done, and nothing is spent, without your approval in writing.</p>
+          <h3>4 — We clear it, and keep it clear</h3>
+          <p>The site does not go back to where it was between visits.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Interactive Property Inspection Estimator Section -->
-  <section class="section-padding" style="background: var(--bg-light); border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
+  <!-- Section: Cleaning is part of the plan (A2) -->
+  <section class="section-padding" style="background: var(--bg-dark); border-bottom: 1px solid var(--border-light);">
     <div class="container">
-      <div class="section-header reveal-on-scroll">
-        <h2 class="section-title">Instant Inspection Fee Calculator</h2>
-        <p class="section-intro">Calculate your exact inspection price in two clicks. No hidden charges.</p>
-      </div>
-
-      <div class="estimator-widget-card reveal-on-scroll">
-        <div class="estimator-grid">
-          <div class="estimator-fields">
-            <div class="est-field-group">
-              <label for="est-proptype">Select Property Category</label>
-              <select id="est-proptype" class="est-select">
-                <option value="site">Vacant Site / Plot / Land</option>
-                <option value="unoccupied">Unoccupied / Locked Flat</option>
-                <option value="rented">Rented Flat (Tenant Managed)</option>
-                <option value="construction">Under Construction Unit</option>
-              </select>
-            </div>
-
-            <div class="est-field-group">
-              <label for="est-size" id="est-size-label">Plot / Site Dimensions</label>
-              <select id="est-size" class="est-select">
-                <option value="small">Up to 30x40 (&lt; 1,200 sq ft)</option>
-                <option value="medium" selected>30x40 to 40x60 (1,200 - 2,400 sq ft)</option>
-                <option value="large">40x60 to 50x80 (2,400 - 4,000 sq ft)</option>
-                <option value="xlarge">50x80+ / Large Site (&gt; 4,000 sq ft)</option>
-              </select>
-            </div>
-
-            <div class="est-field-group">
-              <label for="est-zone">Property Location Zone</label>
-              <select id="est-zone" class="est-select">
-                <option value="city">Bengaluru City Limits (Sarjapur, Whitefield, Indiranagar, etc.)</option>
-                <option value="outskirts">Bengaluru Outskirts / Suburban Belt (Devanahalli, Nelamangala, etc.)</option>
-              </select>
-            </div>
-
-            <div class="est-field-group">
-              <label for="est-plan">Inspection Frequency &amp; Plan</label>
-              <select id="est-plan" class="est-select">
-                <option value="first_visit">Single First Visit (₹2,500 / ₹3,500 credit back)</option>
-                <option value="quarterly" selected>Quarterly Plan (4 Inspections / Year)</option>
-                <option value="monthly">Monthly Plan (12 Inspections / Year)</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="estimator-result-panel">
-            <span style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: var(--brand-gold); letter-spacing: 1px;">ESTIMATED INSPECTION FEE</span>
-            <div id="est-price-val" class="est-price-display">₹16,000 / yr</div>
-            <p id="est-subtitle" class="est-price-subtitle">4 inspections / year. Includes geotagged PDF report &amp; WhatsApp video update on every visit.</p>
-            
-            <ul class="est-feature-list">
-              <li>100% Geotagged &amp; Timestamped GPS Metadata</li>
-              <li>Fixed Camera Angles &amp; Boundary Check</li>
-              <li>First Visit Fee Credited 100% On Annual Plan</li>
-            </ul>
-
-            <a id="est-book-btn" href="https://wa.me/919242143775" target="_blank" class="btn btn-whatsapp" style="padding: 14px 28px; width: 100%; justify-content: center;">
-              <span>Confirm &amp; Book via WhatsApp</span>
-            </a>
-          </div>
+      <div class="cleaning-plan-card reveal-on-scroll">
+        <h2 class="cleaning-plan-title">Cleaning is part of the plan</h2>
+        <div class="cleaning-plan-body">
+          <p>The first clearing is quoted after we have seen the site — how much has been dumped, how overgrown it is, how many trips it takes to remove. You get that figure in writing before anything starts.</p>
+          <p>After that, keeping it clear is part of your annual plan. You are not billed for cleaning again.</p>
+          <p>Anything else — fencing, gate or compound wall repair, boundary markers, resolving a municipal notice — is quoted separately. Nothing is done, and nothing is spent, without your approval in writing.</p>
+        </div>
+        <div style="margin-top: 24px;">
+          <a href="https://wa.me/919242143775" target="_blank" class="btn btn-whatsapp" style="padding: 14px 30px;">
+            <span>Send us the location on WhatsApp</span>
+          </a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Section 4: The report -->
+  <!-- Section 4: A detailed report on your property (A5) -->
   <section id="the-report" class="section-padding report-section">
     <div class="container">
       <div class="section-header reveal-on-scroll">
-        <h2 class="section-title">The report is the product.</h2>
-        <p class="section-intro">You cannot verify anything from 8,000 kilometres away. So the report has to be verifiable on its own.</p>
+        <h2 class="section-title">A detailed report on your property, every time we visit</h2>
+        <p class="section-intro">You cannot go and look yourself. So the report has to stand up on its own.</p>
       </div>
 
       <div class="report-grid reveal-on-scroll">
         <div class="report-feature-card">
-          <h4>1. GPS Geotagged Metadata</h4>
-          <p>Every photograph carries its GPS coordinates and the date and time it was taken. The metadata is intact and available to you on request.</p>
+          <h4>The date and the place are on the photograph</h4>
+          <p>Every photograph carries the GPS coordinates of where it was taken and the date and time it was taken. Not typed underneath — inside the file. Ask for the original files any time and we will send them.</p>
         </div>
 
         <div class="report-feature-card">
-          <h4>2. Fixed Camera Positions</h4>
-          <p>We photograph from the same fixed positions every visit. Same corner, same angle, same frame. One report is a snapshot. Four reports are a record — you can see the boundary, the fence and the dumping holding steady or changing, quarter by quarter.</p>
+          <h4>The same corner, every time</h4>
+          <p>We photograph from the same fixed positions on every visit. Same corner, same angle, same frame. One report tells you how your property looks today. Four reports tell you whether it is holding steady or slipping.</p>
         </div>
 
         <div class="report-feature-card">
-          <h4>3. Named Inspector Accountability</h4>
-          <p>Every report names the person who visited. If you have a question about what is in it, there is someone to ask.</p>
+          <h4>The name of the person who went</h4>
+          <p>Every report names the person who visited. If something in it does not make sense, there is someone to ask.</p>
         </div>
 
         <div class="report-feature-card">
-          <h4>4. Continuous Video Walk-through</h4>
-          <p>We include a short video walk-through of the property with every report.</p>
+          <h4>A short video, so you can look around yourself</h4>
+          <p>A walk-through with every report. Photographs show you what we chose to show you. The video shows you the rest.</p>
         </div>
       </div>
 
@@ -485,7 +441,7 @@
         </div>
       </div>
 
-      <!-- Live Interactive Sample Inspection Report Showcase -->
+      <!-- Live Interactive Sample Inspection Report Showcase (A6) -->
       <div class="live-report-wrapper reveal-on-scroll">
         <!-- Header Banner -->
         <div class="report-header-banner">
@@ -532,7 +488,7 @@
             </div>
             <div class="report-meta-item">
               <span class="lbl">INSPECTED BY</span>
-              <span class="val">Certified PropVigil Inspector</span>
+              <span class="val">Rajesh Kumar, Lead Inspector</span>
             </div>
           </div>
 
@@ -716,66 +672,19 @@
     </div>
   </section>
 
-  <!-- Section 7: Pricing summary -->
-  <section class="section-padding" style="background: var(--bg-light); border-top: 1px solid var(--border-light);">
-    <div class="container">
-      <div class="reveal-on-scroll">
-        <h2 class="section-title">What it costs</h2>
-        <p style="font-size: 1.15rem; margin-bottom: 24px; color: var(--brand-navy);">
-          <strong>First visit:</strong> ₹2,500 within Bengaluru city limits · ₹3,500 for outskirts
-        </p>
-
-        <div class="data-table-wrapper">
-          <table class="plain-data-table">
-            <thead>
-              <tr>
-                <th>Property Type</th>
-                <th>Quarterly — 4 visits a year</th>
-                <th>Monthly — 12 visits a year</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Vacant land or site</strong></td>
-                <td>₹16,000</td>
-                <td>from ₹28,000</td>
-              </tr>
-              <tr>
-                <td><strong>Unoccupied flat</strong></td>
-                <td>₹22,000</td>
-                <td>from ₹36,000</td>
-              </tr>
-              <tr>
-                <td><strong>Rented flat</strong></td>
-                <td>—</td>
-                <td>from ₹44,000</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 24px;">Rented flats are monthly only. Quarterly oversight of a tenanted property is not oversight.</p>
-
-        <a href="pricing.html" class="btn btn-navy">
-          <span>See full pricing & details</span>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Section 8: Civic updates teaser -->
+  <!-- Section 7: Civic updates teaser (A9) -->
   <section class="section-padding">
     <div class="container">
       <div class="reveal-on-scroll">
         <h2 class="section-title">Municipal notices you would not otherwise hear about</h2>
         <p class="section-intro" style="text-align: left; margin-bottom: 30px;">
-          Bengaluru's civic bodies issue notices that place obligations on property owners, with deadlines and recovery costs attached. If you do not live here, you will not see them. We track them and post them here as they are issued, with the original document attached and the relevant bye-law cited.
+          Bengaluru's civic bodies issue notices that place obligations on property owners, with deadlines and recovery costs attached. If you do not live here, you will not see them. We track them and post them here as they are issued, with the original document available on request and the relevant bye-law cited.
         </p>
 
         <div style="background: var(--gold-light); border: 1px solid var(--border-gold); padding: 28px; border-radius: var(--radius-md);">
           <span style="font-size: 0.8rem; font-weight: 700; color: var(--brand-gold); text-transform: uppercase;">LATEST ENTRY</span>
           <h3 style="font-size: 1.3rem; margin: 8px 0 10px 0;">Greater Bengaluru Authority, 10 August 2026: vacant site owners directed to clear waste and debris</h3>
-          <p style="font-size: 0.95rem; margin-bottom: 18px; color: var(--text-body);">Ref CC/PS/PR/240/2026-27 under Solid Waste Management Bye-laws 2020 & Section 285(2) of GBA Act 2024.</p>
+          <p style="font-size: 0.95rem; margin-bottom: 18px; color: var(--text-body);">Ref CC/PS/PR/240/2026-27 under Solid Waste Management Bye-laws 2020 & Section 285(2) of Greater Bengaluru Governance Act, 2024.</p>
           <a href="civic-updates.html" class="btn btn-gold" style="padding: 10px 22px; font-size: 0.9rem;">
             <span>Read full notice & rate schedule</span>
           </a>
@@ -784,7 +693,7 @@
     </div>
   </section>
 
-  <!-- Section 9: Who we are -->
+  <!-- Section 8: Who we are -->
   <section class="section-padding" style="background: var(--bg-light); border-top: 1px solid var(--border-light);">
     <div class="container">
       <div class="who-we-are-grid reveal-on-scroll">
@@ -819,7 +728,7 @@
     </div>
   </section>
 
-  <!-- Section 10: Frequently asked questions -->
+  <!-- Section 9: Frequently asked questions -->
   <section class="section-padding">
     <div class="container">
       <div class="section-header reveal-on-scroll">
@@ -873,7 +782,7 @@
             <div class="accordion-icon">▼</div>
           </h4>
           <div class="faq-answer">
-            <p>We quote before any work. You approve in writing. You receive the vendor invoice and photographs of the completed work. Our charge is stated separately, so you always know what is the vendor's cost and what is ours.</p>
+            <p>The first clearing of a site is quoted as a single figure before anything starts. After that, cleaning is part of your annual plan and is not billed again. Other work — fencing, a repair, a boundary marker, resolving a municipal notice — is quoted each time. You approve in writing, and you get photographs when it is done. If a job turns out to need more than was quoted, we stop and come back to you with a revised figure. We do not carry on and bill you afterwards.</p>
           </div>
         </div>
 
@@ -890,12 +799,12 @@
     </div>
   </section>
 
-  <!-- Section 11: Final Call to Action -->
+  <!-- Section 10: Final Call to Action -->
   <section class="section-padding">
     <div class="container">
       <div style="background: var(--brand-navy); padding: 60px 40px; border-radius: var(--radius-lg); text-align: center; border: 2px solid var(--border-gold); box-shadow: var(--shadow-lg);" class="reveal-on-scroll">
         <h2 style="color: var(--brand-gold); font-size: 2.5rem; margin-bottom: 16px;">Send us the location. We will take it from there.</h2>
-        <p style="font-size: 1.15rem; color: #FFFFFF; max-width: 720px; margin: 0 auto 36px auto; font-weight: 500;">Tell us what you own and where it is. We will confirm the price for a first visit and, if you want to go ahead, arrange it. We reply within one working day.</p>
+        <p style="font-size: 1.15rem; color: #FFFFFF; max-width: 720px; margin: 0 auto 36px auto; font-weight: 500;">Tell us what you own and where it is. We will confirm your price in writing and, if you want to go ahead, arrange it. We reply within one working day.</p>
 
         <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
           <a href="https://wa.me/919242143775" target="_blank" class="btn btn-whatsapp" style="padding: 16px 32px;">
@@ -926,7 +835,7 @@
             <li><a href="#what-we-do">What we do</a></li>
             <li><a href="#how-it-works">How it works</a></li>
             <li><a href="#the-report">Your report</a></li>
-            <li><a href="pricing.html">Pricing</a></li>
+            <li><a href="pricing.html">What's included</a></li>
             <li><a href="civic-updates.html">Civic updates</a></li>
             <li><a href="contact.html">Contact</a></li>
           </ul>

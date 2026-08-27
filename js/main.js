@@ -25,9 +25,130 @@ function getApiUrl(path) {
   return path;
 }
 
-// Dynamic Civic Updates API Engine
+// Default seed civic notices (Entry 1 and Entry 2)
+const DEFAULT_CIVIC_NOTICES = [
+  {
+    id: "notice-gba-2026-001",
+    slug: "gba-vacant-site-clearing-notice-2026",
+    entry_label: "ENTRY 1 — GBA VACANT SITE CLEARING NOTICE",
+    title: "Greater Bengaluru Authority — vacant site owners directed to clear waste and debris",
+    issued_date: "2026-08-10",
+    ref_number: "CC/PS/PR/240/2026-27",
+    status: "deadline passed 15 August 2026. Recovery of cleaning and transportation costs through property tax now applies to sites that were not cleared.",
+    status_type: "danger",
+    is_published: true,
+    what_was_issued: "The Greater Bengaluru Authority published a public notice under its \"Freedom from Waste\" campaign, conducted during August 2026. Owners of vacant sites within GBA limits were directed to remove all waste, garbage and debris from their sites on or before 15 August 2026. Disposal was to be at designated locations notified by the Municipal Corporation, or through agencies notified by the Corporation for cleaning and disposal.",
+    rule_behind_it: "Bye-law 18(1)(b) of the Solid Waste Management Bye-laws, 2020 places the responsibility for maintaining vacant sites in a clean and hygienic condition on the owner.",
+    consequences: "The notice states that the Municipal Corporation will undertake removal of the waste itself, and that the expenditure incurred will be recovered from the property owner along with property tax. The recovery is made under bye-law 18(1)(d)(ii) of the Solid Waste Management Bye-laws, 2020 and Section 285(2) of the Greater Bengaluru Governance Act, 2024.\n\nThis is not a fine. It is the Corporation's cost of doing the work, recovered through your property tax.",
+    rates: [
+      { dimensions: "20 × 30 = 600 sq. ft. (55.74 sq. m.)", no_wall: "₹6,700", with_wall: "₹7,700", transport: "₹19,200" },
+      { dimensions: "30 × 40 = 1,200 sq. ft. (111.48 sq. m.)", no_wall: "₹13,400", with_wall: "₹14,400", transport: "₹38,400" },
+      { dimensions: "30 × 50 = 1,500 sq. ft. (139.35 sq. m.)", no_wall: "₹16,750", with_wall: "₹17,750*", transport: "₹48,000" },
+      { dimensions: "40 × 60 = 2,400 sq. ft. (222.97 sq. m.)", no_wall: "₹26,800", with_wall: "₹27,800", transport: "₹76,800" },
+      { dimensions: "50 × 80 = 4,000 sq. ft. (371.61 sq. m.)", no_wall: "₹46,700", with_wall: "₹47,700", transport: "₹1,28,000" }
+    ],
+    pdf_url: "sample-report.pdf",
+    pdf_filename: "GBA_Vacant_Site_Clearing_Notice_Aug2026.pdf",
+    created_at: "2026-08-10T10:00:00Z"
+  },
+  {
+    id: "notice-gba-2026-002",
+    slug: "solid-waste-management-byelaw-2020-fencing-mandate",
+    entry_label: "ENTRY 2 — MANDATORY SITE FENCING & MAINTENANCE",
+    title: "Mandatory Perimeter Fencing & Debris Barrier Compliance for Unbuilt Sites",
+    issued_date: "2026-07-28",
+    ref_number: "SWM/BYE-LAW/18/2026",
+    status: "Active Mandate — Inspection In Progress",
+    status_type: "warning",
+    is_published: true,
+    what_was_issued: "Notice to all vacant plot owners across Greater Bengaluru zone to erect visible compound boundary walls or barbed-wire mesh fencing to prevent illegal municipal dumping by commercial waste vendors.",
+    rule_behind_it: "Rule 18(2) of the Municipal Solid Waste Bye-laws 2020 and KMC Act Section 288.",
+    consequences: "Unfenced properties identified as chronic dumping zones will be penalised per metric tonne of accumulated waste alongside municipal clearance surcharges.",
+    rates: [
+      { dimensions: "Standard Plot Fencing (Chainlink)", no_wall: "₹120 / running ft", with_wall: "₹250 / running ft", transport: "Included" }
+    ],
+    pdf_url: "sample-report.pdf",
+    pdf_filename: "SWM_Fencing_Mandate_2026.pdf",
+    created_at: "2026-07-28T14:30:00Z"
+  }
+];
+
 let civicNoticesData = [];
 let activeFilter = 'all';
+
+function getDeletedNoticeIds() {
+  try {
+    const raw = localStorage.getItem('propvigil_deleted_notices');
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+async function loadAllCivicNotices() {
+  const deletedIds = getDeletedNoticeIds();
+  let notices = [];
+
+  // 1. Check localStorage first
+  try {
+    const local = localStorage.getItem('propvigil_civic_notices');
+    if (local) {
+      const parsed = JSON.parse(local);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        notices = parsed;
+      }
+    }
+  } catch (e) {}
+
+  // 2. Try fetching from server API or static JSON file
+  try {
+    const res = await fetch(getApiUrl('/api/civic-updates'));
+    const data = await res.json();
+    if (data.success && Array.isArray(data.notices) && data.notices.length > 0) {
+      data.notices.forEach(n => {
+        if (!notices.some(item => (item.id && item.id === n.id) || (item.slug && item.slug === n.slug))) {
+          notices.push(n);
+        }
+      });
+    }
+  } catch (e) {
+    try {
+      const resFile = await fetch('data/civic_notices.json');
+      const fileData = await resFile.json();
+      if (Array.isArray(fileData) && fileData.length > 0) {
+        fileData.forEach(n => {
+          if (!notices.some(item => (item.id && item.id === n.id) || (item.slug && item.slug === n.slug))) {
+            notices.push(n);
+          }
+        });
+      }
+    } catch (err) {}
+  }
+
+  // 3. Fallback to default seed notices if empty
+  if (notices.length === 0) {
+    notices = [...DEFAULT_CIVIC_NOTICES];
+  } else {
+    // Ensure default notices exist unless explicitly deleted
+    DEFAULT_CIVIC_NOTICES.forEach(def => {
+      if (!deletedIds.includes(def.id) && !deletedIds.includes(def.slug)) {
+        if (!notices.some(item => item.id === def.id || item.slug === def.slug)) {
+          notices.push(def);
+        }
+      }
+    });
+  }
+
+  // Filter out any explicitly deleted notices
+  notices = notices.filter(n => !deletedIds.includes(n.id) && !deletedIds.includes(n.slug));
+
+  civicNoticesData = notices;
+  try {
+    localStorage.setItem('propvigil_civic_notices', JSON.stringify(civicNoticesData));
+  } catch (e) {}
+
+  return civicNoticesData;
+}
 
 async function initCivicUpdates() {
   const container = document.getElementById('civic-notices-container');
@@ -36,16 +157,17 @@ async function initCivicUpdates() {
 
   if (!container) return;
 
-  try {
-    const res = await fetch(getApiUrl('/api/civic-updates'));
-    const data = await res.json();
+  const notices = await loadAllCivicNotices();
+  // Filter for published notices on public website
+  const publishedNotices = notices.filter(n => n.is_published !== false);
+  renderCivicNotices(publishedNotices);
 
-    if (data.success && data.notices && data.notices.length > 0) {
-      civicNoticesData = data.notices;
-      renderCivicNotices(civicNoticesData);
-    }
-  } catch (err) {
-    console.log('Using static backup notices for offline preview');
+  // If a hash anchor is provided (e.g. #slug), scroll to it smoothly
+  if (window.location.hash) {
+    setTimeout(() => {
+      const el = document.querySelector(window.location.hash);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 200);
   }
 
   if (searchInput) {
@@ -66,19 +188,20 @@ async function initCivicUpdates() {
 }
 
 function filterAndRenderNotices(searchQuery, filterType) {
-  let list = civicNoticesData;
+  let list = civicNoticesData.filter(n => n.is_published !== false);
 
   if (filterType !== 'all') {
     list = list.filter(n => n.status_type === filterType);
   }
 
-  if (searchQuery.trim() !== '') {
-    const q = searchQuery.toLowerCase();
+  if (searchQuery && searchQuery.trim() !== '') {
+    const q = searchQuery.toLowerCase().trim();
     list = list.filter(n => 
-      n.title.toLowerCase().includes(q) ||
+      (n.title && n.title.toLowerCase().includes(q)) ||
       (n.ref_number && n.ref_number.toLowerCase().includes(q)) ||
       (n.what_was_issued && n.what_was_issued.toLowerCase().includes(q)) ||
-      (n.rule_behind_it && n.rule_behind_it.toLowerCase().includes(q))
+      (n.rule_behind_it && n.rule_behind_it.toLowerCase().includes(q)) ||
+      (n.consequences && n.consequences.toLowerCase().includes(q))
     );
   }
 
@@ -122,9 +245,9 @@ function renderCivicNotices(notices) {
                 ${item.rates.map(r => `
                   <tr>
                     <td><strong>${r.dimensions}</strong></td>
-                    <td>${r.no_wall}</td>
-                    <td>${r.with_wall}</td>
-                    <td>${r.transport}</td>
+                    <td>${r.no_wall || '-'}</td>
+                    <td>${r.with_wall || '-'}</td>
+                    <td>${r.transport || '-'}</td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -135,7 +258,7 @@ function renderCivicNotices(notices) {
     }
 
     return `
-      <div class="notice-card-elevated reveal-on-scroll revealed" id="${item.slug}">
+      <div class="notice-card-elevated reveal-on-scroll revealed" id="${item.slug}" style="margin-bottom: 36px;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
           <span style="font-size: 0.85rem; font-weight: 700; color: var(--brand-gold); text-transform: uppercase;">${item.entry_label || 'CIVIC NOTICE'}</span>
           <span class="status-badge-tag ${badgeClass}">${badgeText}</span>
@@ -180,9 +303,9 @@ function renderCivicNotices(notices) {
         ${ratesHtml}
 
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border-light);">
-          <a href="${item.pdf_url ? item.pdf_url : 'https://wa.me/919242143775?text=Hello%20PropVigil%20Team,%20please%20send%20me%20the%20original%20Notice%20PDF%20Ref%20' + encodeURIComponent(item.ref_number || '')}" target="_blank" class="btn-pdf-download">
+          <a href="https://wa.me/919242143775?text=Hello%20PropVigil%20Team,%20please%20send%20me%20the%20original%20Notice%20PDF%20Ref%20${encodeURIComponent(item.ref_number || item.title)}" target="_blank" class="btn-pdf-download">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-            <span>${item.pdf_url ? 'View Uploaded PDF (' + (item.pdf_filename || 'Document') + ')' : 'Request Notice Document via WhatsApp'}</span>
+            <span>Request Original PDF Notice via WhatsApp</span>
           </a>
 
           <a href="https://wa.me/919242143775" target="_blank" class="btn btn-whatsapp" style="padding: 14px 28px;">
@@ -1611,17 +1734,10 @@ async function loadAdminNoticesTable() {
   const tbody = document.getElementById('cmsNoticesTableBody');
   if (!tbody) return;
 
-  let notices = [];
-  try {
-    const res = await fetch(getApiUrl('/api/admin/civic-updates'));
-    const data = await res.json();
-    if (data.success && data.notices) notices = data.notices;
-  } catch (e) {
-    notices = civicNoticesData;
-  }
+  const notices = await loadAllCivicNotices();
 
-  if (notices.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #64748B; padding: 40px;">No civic notices available.</td></tr>`;
+  if (!notices || notices.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #64748B; padding: 40px;">No civic notices available. Click "+ Create Civic Notice" to add one.</td></tr>`;
     return;
   }
 
@@ -1638,14 +1754,34 @@ async function loadAdminNoticesTable() {
         </span>
       </td>
       <td>
-        <div class="cms-actions-group" style="justify-content: flex-end;">
-          <a href="civic-updates.html#${item.slug}" target="_blank" class="btn-cms-action view">View</a>
-          <button onclick="deleteNotice('${item.id}')" class="btn-cms-action delete">Delete</button>
+        <div class="cms-actions-group" style="justify-content: flex-end; gap: 8px;">
+          <button onclick="togglePublishNotice('${item.id}', ${item.is_published === false})" class="btn-cms-action ${item.is_published !== false ? 'unpublish' : 'publish'}" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">
+            ${item.is_published !== false ? 'Unpublish' : 'Publish'}
+          </button>
+          <a href="civic-updates.html#${item.slug}" target="_blank" class="btn-cms-action view" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; text-decoration: none;">View</a>
+          <button onclick="deleteNotice('${item.id}')" class="btn-cms-action delete" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">Delete</button>
         </div>
       </td>
     </tr>
   `).join('');
 }
+
+window.togglePublishNotice = async function(id, publishState) {
+  const notice = civicNoticesData.find(n => (n.id && n.id === id) || (n.slug && n.slug === id));
+  if (notice) {
+    notice.is_published = publishState;
+    localStorage.setItem('propvigil_civic_notices', JSON.stringify(civicNoticesData));
+  }
+  try {
+    await fetch(getApiUrl('/api/admin/civic-updates/publish'), {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, is_published: publishState })
+    });
+  } catch (e) {}
+  showToast(publishState ? '✓ Civic notice published to website' : '✓ Civic notice unpublished (saved as draft)');
+  loadAdminNoticesTable();
+};
 
 function initAdminNoticeModal() {
   const modal = document.getElementById('noticeModal');
@@ -1659,6 +1795,8 @@ function initAdminNoticeModal() {
   if (btnCreate) {
     btnCreate.addEventListener('click', () => {
       form.reset();
+      const dateEl = document.getElementById('noticeFormDate');
+      if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
       modal.classList.add('open');
     });
   }
@@ -1669,49 +1807,83 @@ function initAdminNoticeModal() {
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const title = document.getElementById('noticeFormTitle').value;
-    const ref = document.getElementById('noticeFormRef').value;
+    const title = document.getElementById('noticeFormTitle').value.trim();
+    const ref = document.getElementById('noticeFormRef').value.trim();
     const date = document.getElementById('noticeFormDate').value;
     const statusType = document.getElementById('noticeFormStatusType').value;
-    const what = document.getElementById('noticeFormWhat').value;
-    const rule = document.getElementById('noticeFormRule').value;
-    const isPublished = document.getElementById('noticeFormPublished').checked;
+    const what = document.getElementById('noticeFormWhat').value.trim();
+    const rule = document.getElementById('noticeFormRule').value.trim();
+    const isPublished = document.getElementById('noticeFormPublished') ? document.getElementById('noticeFormPublished').checked : true;
 
-    const payload = {
-      title,
+    const newId = 'notice-' + Date.now();
+    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || newId;
+    const entryNum = civicNoticesData.length + 1;
+    const entryLabel = `ENTRY ${entryNum} — ${title.toUpperCase().slice(0, 35)}`;
+
+    const newNotice = {
+      id: newId,
+      slug: slug,
+      entry_label: entryLabel,
+      title: title,
       ref_number: ref,
       issued_date: date || new Date().toISOString().split('T')[0],
+      status: statusType === 'danger' ? 'Deadline Passed' : (statusType === 'success' ? 'Compliant' : 'Active Mandate'),
       status_type: statusType,
       what_was_issued: what,
       rule_behind_it: rule,
+      consequences: 'Failure to comply may result in municipal clearance action and recovery through property taxes.',
       is_published: isPublished,
-      slug: title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+      pdf_url: '',
+      pdf_filename: '',
+      created_at: new Date().toISOString()
     };
 
+    // 1. Immediately prepend to local list and save to localStorage
+    civicNoticesData.unshift(newNotice);
+    localStorage.setItem('propvigil_civic_notices', JSON.stringify(civicNoticesData));
+
+    // 2. Try POSTing to server API if online
     try {
       await fetch(getApiUrl('/api/admin/civic-updates'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(newNotice)
       });
     } catch (e) {}
 
     closeModal();
-    showToast('✓ Civic notice created successfully!');
+    showToast('✓ Civic notice created and published to website!');
     loadAdminNoticesTable();
   });
 }
 
 window.deleteNotice = async function(id) {
-  if (!confirm('Are you sure you want to delete this civic notice?')) return;
+  const notice = civicNoticesData.find(n => (n.id && n.id === id) || (n.slug && n.slug === id));
+  const targetTitle = notice ? notice.title : 'this civic notice';
+  if (!confirm(`Are you sure you want to delete "${targetTitle}"?`)) return;
+
+  const targetSlug = notice ? notice.slug : '';
+
+  // Track deleted notice ID and slug so defaults don't reappear
+  let deletedIds = getDeletedNoticeIds();
+  if (id && !deletedIds.includes(id)) deletedIds.push(id);
+  if (targetSlug && !deletedIds.includes(targetSlug)) deletedIds.push(targetSlug);
+  localStorage.setItem('propvigil_deleted_notices', JSON.stringify(deletedIds));
+
+  // Remove from memory and localStorage
+  civicNoticesData = civicNoticesData.filter(n => n.id !== id && (!targetSlug || n.slug !== targetSlug));
+  localStorage.setItem('propvigil_civic_notices', JSON.stringify(civicNoticesData));
+
+  // Call server DELETE API if online
   try {
     await fetch(getApiUrl('/api/admin/civic-updates'), {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id })
+      body: JSON.stringify({ id, slug: targetSlug, title: targetTitle })
     });
   } catch (e) {}
-  showToast('✓ Civic notice deleted');
+
+  showToast('✓ Civic notice deleted from website');
   loadAdminNoticesTable();
 };
 
