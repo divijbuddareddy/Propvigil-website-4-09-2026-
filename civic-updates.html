@@ -46,7 +46,7 @@
         <li><a href="pricing.html" class="nav-link">What's included</a></li>
         <li><a href="civic-updates.html" class="nav-link active">Civic updates</a></li>
         <li><a href="blog.html" class="nav-link">Blog</a></li>
-        <li><a href="contact.html" class="nav-link">Contact</a></li>
+        <li><a href="contact.html" class="nav-link">Get started</a></li>
       </ul>
 
       <div style="display: flex; gap: 12px; align-items: center;">
@@ -67,18 +67,10 @@
         <p style="font-size: 0.92rem; color: var(--text-muted);"><em>We are not a government body and we have no affiliation with one. This page reports what has been published.</em></p>
       </div>
 
-      <!-- Search & Filter Pill Bar -->
-      <div class="civic-filter-bar reveal-on-scroll">
-        <div class="search-box-wrapper">
-          <svg class="search-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="civic-search-input" class="search-box-input" placeholder="Search notices by keyword, reference number, or rule...">
-        </div>
-
+      <!-- Notice Category Tab Bar -->
+      <div class="civic-filter-bar reveal-on-scroll" style="justify-content: flex-start;">
         <div class="filter-pills-group">
-          <button class="filter-pill-btn active" data-filter="all">All Notices</button>
-          <button class="filter-pill-btn" data-filter="danger">Deadline Passed</button>
-          <button class="filter-pill-btn" data-filter="warning">Active Mandate</button>
-          <button class="filter-pill-btn" data-filter="success">Compliant</button>
+          <button class="filter-pill-btn active" data-filter="all" style="cursor: default;">All Official Government Notices</button>
         </div>
       </div>
     </div>
@@ -88,23 +80,54 @@
   <section class="section-padding" style="padding-top: 40px;">
     <div class="container" id="civic-notices-container">
       
-      <!-- Entry 1 Static Backup Fallback -->
+      <!-- Entry 1 Official Government Public Notice -->
       <div class="notice-card-elevated reveal-on-scroll">
         
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
-          <span style="font-size: 0.85rem; font-weight: 700; color: var(--brand-gold); text-transform: uppercase;">ENTRY 1 — GBA VACANT SITE CLEARING NOTICE</span>
-          <span class="status-badge-tag danger">Deadline Passed</span>
+          <span style="font-size: 0.85rem; font-weight: 700; color: var(--brand-gold); text-transform: uppercase;">GOVERNMENT PUBLIC NOTICE — GREATER BENGALURU AUTHORITY</span>
+          <span class="status-badge-tag official">OFFICIAL NOTICE</span>
         </div>
 
-        <h2 style="font-size: 2rem; color: var(--brand-navy); margin: 6px 0 12px 0;">Greater Bengaluru Authority — vacant site owners directed to clear waste and debris</h2>
+        <h2 style="font-size: 2rem; color: var(--brand-navy); margin: 6px 0 12px 0;">Greater Bengaluru Authority — Vacant Site Owners Directed to Clear Waste and Debris</h2>
         
         <p style="font-size: 0.9rem; color: var(--text-muted); padding-bottom: 20px; border-bottom: 1px solid var(--border-light); margin-bottom: 24px;">
-          Issued 10 August 2026 · Ref. CC/PS/PR/240/2026-27 · Status: deadline passed 15 August 2026. Recovery of cleaning and transportation costs through property tax now applies to sites that were not cleared.
+          Issued 10 August 2026 · Ref. CC/PS/PR/240/2026-27 · Office of the Chief Commissioner, Annex-1, N R Road, Bengaluru – 560001
         </p>
+
+        <!-- Attached Official Government Public Notice Document -->
+        <div class="official-doc-attachment-card" style="margin: 0 0 28px 0; border: 1.5px solid var(--border-gold); background: #F8FAFC; border-radius: var(--radius-md); padding: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.04);">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: var(--brand-navy); color: var(--brand-gold); border-radius: 6px; font-weight: bold; font-size: 1.1rem;">📄</span>
+              <div>
+                <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--brand-navy); margin: 0;">Attached Government Public Notice Document</h4>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin: 2px 0 0 0;">Official scan from Greater Bengaluru Authority · Ref. CC/PS/PR/240/2026-27</p>
+              </div>
+            </div>
+            <a href="assets/gba-public-notice-2026.jpg" target="_blank" class="btn-pdf-download" style="padding: 8px 16px; font-size: 0.82rem;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+              <span>Open Full Document</span>
+            </a>
+          </div>
+
+          <div style="background: white; border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 12px; text-align: center;">
+            <a href="assets/gba-public-notice-2026.jpg" target="_blank" title="Click to view full high-resolution notice document">
+              <img src="assets/gba-public-notice-2026.jpg" alt="Official Greater Bengaluru Authority Public Notice Ref CC/PS/PR/240/2026-27" style="max-width: 100%; height: auto; max-height: 580px; object-fit: contain; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.005)'" onmouseout="this.style.transform='scale(1)'">
+            </a>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 12px; margin-bottom: 0;">
+              🔍 <em>Click the document above to view or download full-size original notice scan</em>
+            </p>
+          </div>
+        </div>
 
         <div style="margin-bottom: 24px;">
           <h3 style="font-size: 1.2rem; color: var(--brand-navy); margin-bottom: 8px;">WHAT WAS ISSUED</h3>
-          <p>The Greater Bengaluru Authority published a public notice under its "Freedom from Waste" campaign, conducted during August 2026. Owners of vacant sites within GBA limits were directed to remove all waste, garbage and debris from their sites on or before 15 August 2026. Disposal was to be at designated locations notified by the Municipal Corporation, or through agencies notified by the Corporation for cleaning and disposal.</p>
+          <p>With the objective of keeping Bengaluru city clean, beautiful, and livable, the "Freedom from Waste" campaign is being conducted during August-2026. As per bye-law 18(1)(b) of the Solid Waste Management Bye-laws, 2020, it is the mandatory responsibility of owners to maintain vacant sites in a clean and hygienic condition.</p>
+          <p style="margin-top: 10px;">Accordingly, the following directions are issued to the general public with respect to the cleaning of vacant sites:</p>
+          <ol style="margin: 10px 0 0 20px; color: var(--text-body); line-height: 1.7;">
+            <li style="margin-bottom: 8px;">Owners of vacant sites within the GBA limits shall ensure that all waste, garbage, and debris accumulated on their vacant site/s are removed on or before <strong>15.08.2026</strong>. The waste/debris shall be disposed of only at the designated disposal locations identified & already notified by the Municipal Corporation. If necessary, owners may also avail the services of agencies notified by the respective Municipal Corporation for cleaning and disposal.</li>
+            <li>If the owners fail to clean their vacant sites by <strong>15.08.2026</strong>, the Municipal Corporation will undertake the removal of the waste/debris. The expenditure incurred will be recovered from the property owners along with property tax in accordance with bye-law 18(1)(d)(ii) of the Solid Waste Management Bye-laws, 2020 and Section 285(2) of the Greater Bengaluru Administration Act, 2024.</li>
+          </ol>
         </div>
 
         <!-- Site Clearing Visual Showcase -->
@@ -123,12 +146,12 @@
 
         <div style="margin-bottom: 24px;">
           <h3 style="font-size: 1.2rem; color: var(--brand-navy); margin-bottom: 8px;">THE RULE BEHIND IT</h3>
-          <p>Bye-law 18(1)(b) of the Solid Waste Management Bye-laws, 2020 places the responsibility for maintaining vacant sites in a clean and hygienic condition on the owner.</p>
+          <p>Bye-law 18(1)(b) of the Solid Waste Management Bye-laws, 2020 places the mandatory responsibility for maintaining vacant sites in a clean and hygienic condition on the owner.</p>
         </div>
 
         <div style="margin-bottom: 24px;">
           <h3 style="font-size: 1.2rem; color: var(--brand-navy); margin-bottom: 8px;">WHAT HAPPENS IF THE SITE IS NOT CLEARED</h3>
-          <p>The notice states that the Municipal Corporation will undertake removal of the waste itself, and that the expenditure incurred will be recovered from the property owner along with property tax. The recovery is made under bye-law 18(1)(d)(ii) of the Solid Waste Management Bye-laws, 2020 and Section 285(2) of the Greater Bengaluru Governance Act, 2024.</p>
+          <p>The notice states that the Municipal Corporation will undertake removal of the waste itself, and that the expenditure incurred will be recovered as shown in the table below from property owners along with property tax. The recovery is made under bye-law 18(1)(d)(ii) of the Solid Waste Management Bye-laws, 2020 and Section 285(2) of the Greater Bengaluru Administration Act, 2024.</p>
           <p style="margin-top: 6px;"><em>This is not a fine. It is the Corporation's cost of doing the work, recovered through your property tax.</em></p>
         </div>
 
@@ -139,42 +162,54 @@
             <table class="plain-data-table">
               <thead>
                 <tr>
-                  <th>Site dimensions</th>
-                  <th>Cleaning — no wall</th>
-                  <th>Cleaning — with wall</th>
-                  <th>Transportation</th>
+                  <th>Sl. No.</th>
+                  <th>Site Dimensions</th>
+                  <th>Cleaning Charges (Without Compound Wall)</th>
+                  <th>Cleaning Charges (With Compound Wall)</th>
+                  <th>Waste/Debris Transportation Charges</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>20 × 30 — 600 sq ft</strong></td>
+                  <td>1</td>
+                  <td><strong>20 × 30 = 600 sq. ft. (55.74 sq. m.)</strong></td>
                   <td>₹6,700</td>
                   <td>₹7,700</td>
                   <td>₹19,200</td>
                 </tr>
                 <tr>
-                  <td><strong>30 × 40 — 1,200 sq ft</strong></td>
+                  <td>2</td>
+                  <td><strong>30 × 40 = 1,200 sq. ft. (111.48 sq. m.)</strong></td>
                   <td>₹13,400</td>
                   <td>₹14,400</td>
                   <td>₹38,400</td>
                 </tr>
                 <tr>
-                  <td><strong>30 × 50 — 1,500 sq ft</strong></td>
+                  <td>3</td>
+                  <td><strong>30 × 50 = 1,500 sq. ft. (139.35 sq. m.)</strong></td>
                   <td>₹16,750</td>
-                  <td>₹17,750</td>
+                  <td>₹17,750*</td>
                   <td>₹48,000</td>
                 </tr>
                 <tr>
-                  <td><strong>40 × 60 — 2,400 sq ft</strong></td>
+                  <td>4</td>
+                  <td><strong>40 × 60 = 2,400 sq. ft. (222.97 sq. m.)</strong></td>
                   <td>₹26,800</td>
                   <td>₹27,800</td>
                   <td>₹76,800</td>
                 </tr>
                 <tr>
-                  <td><strong>50 × 80 — 4,000 sq ft</strong></td>
+                  <td>5</td>
+                  <td><strong>50 × 80 = 4,000 sq. ft. (371.61 sq. m.)</strong></td>
                   <td>₹46,700</td>
                   <td>₹47,700</td>
                   <td>₹1,28,000</td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td colspan="4" style="color: var(--text-muted); font-style: italic; background: #F8FAFC;">
+                    In case, site dimension/area exceeding above limit, expenditure proportionate to the site area will be recovered.
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -182,12 +217,12 @@
         </div>
 
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border-light);">
-          <a href="https://wa.me/919242143775?text=Hello%20PropVigil%20Team,%20please%20send%20me%20the%20original%20GBA%20Notice%20PDF%20Ref%20CC/PS/PR/240/2026-27" target="_blank" class="btn-pdf-download">
+          <a href="assets/gba-public-notice-2026.jpg" target="_blank" class="btn-pdf-download">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-            <span>Request Original PDF Notice via WhatsApp</span>
+            <span>View / Download Official Notice</span>
           </a>
 
-          <a href="https://wa.me/919242143775" target="_blank" class="btn btn-whatsapp" style="padding: 14px 28px;">
+          <a href="https://wa.me/919242143775?text=Hello%20PropVigil%20Team,%20I%20saw%20the%20GBA%20vacant%20site%20clearing%20public%20notice.%20I%20need%20assistance%20with%20site%20inspection%20and%20clearing." target="_blank" class="btn btn-whatsapp" style="padding: 14px 28px;">
             <span>Need site clearing? Contact us on WhatsApp</span>
           </a>
         </div>
@@ -215,7 +250,7 @@
             <li><a href="index.html#the-report">Your report</a></li>
             <li><a href="pricing.html">What's included</a></li>
             <li><a href="civic-updates.html">Civic updates</a></li>
-            <li><a href="contact.html">Contact</a></li>
+            <li><a href="contact.html">Get started</a></li>
           </ul>
         </div>
 
@@ -233,7 +268,7 @@
           <h4>Contact Us</h4>
           <p style="color: #F1F5F9; font-size: 0.95rem; font-weight: 700; margin-bottom: 8px;">V P Srinivasa, Founder</p>
           <p style="margin-bottom: 8px;"><a href="tel:+919242143775" style="color: var(--brand-gold); font-weight: 800; font-size: 1.15rem;">+91 92421 43775</a></p>
-          <p style="color: #94A3B8; font-size: 0.9rem; margin-bottom: 6px;"><a href="mailto:saikrupaassociates@gmail.com" style="color: #94A3B8;">saikrupaassociates@gmail.com</a></p>
+          <p style="color: #94A3B8; font-size: 0.9rem; margin-bottom: 6px;"><a href="mailto:saikrupaassociates26@gmail.com" style="color: #94A3B8;">saikrupaassociates26@gmail.com</a></p>
           <p style="color: #94A3B8; font-size: 0.9rem;">Based in Bengaluru</p>
         </div>
       </div>

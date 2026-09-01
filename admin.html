@@ -106,24 +106,16 @@
       </div>
     </header>
 
-    <!-- Navigation Tabs -->
-    <div style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 0 32px;">
-      <div style="max-width: 1200px; margin: 0 auto; display: flex; gap: 16px;">
-        <button class="tab-btn active" id="tabBlogsBtn">Blog Posts</button>
-        <button class="tab-btn" id="tabNoticesBtn">Civic Notices</button>
-      </div>
-    </div>
-
     <!-- Main CMS Container -->
     <main class="cms-container">
 
       <!-- Toast Feedback -->
       <div id="cmsToast" class="toast-feedback"></div>
 
-      <!-- SECTION 1: BLOG POSTS MANAGER (Image 3 UI) -->
+      <!-- SECTION: BLOG POSTS MANAGER (Articles) -->
       <section id="sectionBlogs">
         <div class="cms-section-header">
-          <h1 class="cms-title">Blog Posts</h1>
+          <h1 class="cms-title">Blog Posts & Guides</h1>
           <button id="btnCreateBlog" class="btn-create-post">
             <span style="font-size: 1.2rem; font-weight: 800;">+</span> Create New Post
           </button>
@@ -144,37 +136,6 @@
               <tr>
                 <td colspan="4" style="text-align: center; color: #64748B; padding: 40px;">
                   Loading blog posts...
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- SECTION 2: CIVIC NOTICES MANAGER -->
-      <section id="sectionNotices" style="display: none;">
-        <div class="cms-section-header">
-          <h1 class="cms-title">Civic Updates & Notices</h1>
-          <button id="btnCreateNotice" class="btn-create-post">
-            <span style="font-size: 1.2rem; font-weight: 800;">+</span> Create Civic Notice
-          </button>
-        </div>
-
-        <div class="cms-table-card">
-          <table class="cms-table">
-            <thead>
-              <tr>
-                <th style="width: 45%;">NOTICE TITLE & REF</th>
-                <th>ISSUED DATE</th>
-                <th>STATUS</th>
-                <th style="text-align: right; width: 28%;">ACTIONS</th>
-              </tr>
-            </thead>
-            <tbody id="cmsNoticesTableBody">
-              <!-- Dynamically populated -->
-              <tr>
-                <td colspan="4" style="text-align: center; color: #64748B; padding: 40px;">
-                  Loading civic notices...
                 </td>
               </tr>
             </tbody>
@@ -318,67 +279,6 @@
 
       </div>
 
-    </div>
-  </div>
-
-  <!-- MODAL: CREATE / EDIT CIVIC NOTICE -->
-  <div id="noticeModal" class="admin-modal-overlay">
-    <div class="admin-modal-box">
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E2E8F0; padding-bottom: 16px; margin-bottom: 24px;">
-        <h2 id="noticeModalTitle" style="font-size: 1.4rem; font-weight: 800; color: #0F172A; margin: 0;">Create Civic Notice</h2>
-        <button id="closeNoticeModal" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748B;">&times;</button>
-      </div>
-
-      <form id="noticeForm">
-        <input type="hidden" id="noticeFormId">
-
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px;">
-          <div>
-            <label class="admin-form-label">Notice Title *</label>
-            <input type="text" id="noticeFormTitle" class="admin-form-input" placeholder="e.g. BBMP Property Tax Revision Notice" required>
-          </div>
-          <div>
-            <label class="admin-form-label">Ref Number</label>
-            <input type="text" id="noticeFormRef" class="admin-form-input" placeholder="e.g. BBMP/TAX/2026/894">
-          </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
-          <div>
-            <label class="admin-form-label">Issued Date</label>
-            <input type="date" id="noticeFormDate" class="admin-form-input">
-          </div>
-          <div>
-            <label class="admin-form-label">Status Type</label>
-            <select id="noticeFormStatusType" class="admin-form-input">
-              <option value="warning">Warning / Attention</option>
-              <option value="danger">Critical / Fine</option>
-              <option value="info">Informational</option>
-              <option value="success">Compliant</option>
-            </select>
-          </div>
-        </div>
-
-        <div style="margin-bottom: 16px;">
-          <label class="admin-form-label">What Was Issued *</label>
-          <textarea id="noticeFormWhat" class="admin-form-input" rows="2" placeholder="Summary of notice..." required></textarea>
-        </div>
-
-        <div style="margin-bottom: 20px;">
-          <label class="admin-form-label">Consequences / Rules</label>
-          <textarea id="noticeFormRule" class="admin-form-input" rows="3" placeholder="Key rules or consequences..."></textarea>
-        </div>
-
-        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px;">
-          <input type="checkbox" id="noticeFormPublished" style="width: 18px; height: 18px; accent-color: #0284C7;" checked>
-          <label for="noticeFormPublished" style="font-weight: 700; color: #0F172A; font-size: 0.95rem; cursor: pointer;">Publish immediately on website</label>
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid #E2E8F0; padding-top: 20px;">
-          <button type="button" id="cancelNoticeModal" class="btn-cms-action unpublish" style="padding: 10px 20px;">Cancel</button>
-          <button type="submit" class="btn-create-post" style="padding: 10px 24px;">Save Notice</button>
-        </div>
-      </form>
     </div>
   </div>
 

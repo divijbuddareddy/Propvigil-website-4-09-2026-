@@ -25,21 +25,24 @@ function getApiUrl(path) {
   return path;
 }
 
-// Default seed civic notices (Entry 1 and Entry 2)
+// Default seed civic notices (Official Government Notice)
 const DEFAULT_CIVIC_NOTICES = [
   {
     id: "notice-gba-2026-001",
     slug: "gba-vacant-site-clearing-notice-2026",
-    entry_label: "ENTRY 1 — GBA VACANT SITE CLEARING NOTICE",
-    title: "Greater Bengaluru Authority — vacant site owners directed to clear waste and debris",
-    issued_date: "2026-08-10",
+    entry_label: "GOVERNMENT PUBLIC NOTICE — GREATER BENGALURU AUTHORITY",
+    title: "Greater Bengaluru Authority — Vacant Site Owners Directed to Clear Waste and Debris",
+    issued_date: "10-08-2026",
     ref_number: "CC/PS/PR/240/2026-27",
-    status: "deadline passed 15 August 2026. Recovery of cleaning and transportation costs through property tax now applies to sites that were not cleared.",
-    status_type: "danger",
+    status: "Official Public Notice as issued by GBA Chief Commissioner",
+    status_type: "official",
     is_published: true,
-    what_was_issued: "The Greater Bengaluru Authority published a public notice under its \"Freedom from Waste\" campaign, conducted during August 2026. Owners of vacant sites within GBA limits were directed to remove all waste, garbage and debris from their sites on or before 15 August 2026. Disposal was to be at designated locations notified by the Municipal Corporation, or through agencies notified by the Corporation for cleaning and disposal.",
-    rule_behind_it: "Bye-law 18(1)(b) of the Solid Waste Management Bye-laws, 2020 places the responsibility for maintaining vacant sites in a clean and hygienic condition on the owner.",
-    consequences: "The notice states that the Municipal Corporation will undertake removal of the waste itself, and that the expenditure incurred will be recovered from the property owner along with property tax. The recovery is made under bye-law 18(1)(d)(ii) of the Solid Waste Management Bye-laws, 2020 and Section 285(2) of the Greater Bengaluru Governance Act, 2024.\n\nThis is not a fine. It is the Corporation's cost of doing the work, recovered through your property tax.",
+    document_img: "assets/gba-public-notice-2026.jpg",
+    pdf_url: "assets/gba-public-notice-2026.jpg",
+    pdf_filename: "GBA_Public_Notice_CC_PS_PR_240_2026_27.jpg",
+    what_was_issued: "With the objective of keeping Bengaluru city clean, beautiful, and livable, the \"Freedom from Waste\" campaign is being conducted during August-2026. As per bye-law 18(1)(b) of the Solid Waste Management Bye-laws, 2020, it is the mandatory responsibility of owners to maintain vacant sites in a clean and hygienic condition.<br><br>Accordingly, the following directions are issued to the general public with respect to the cleaning of vacant sites:<br>1. Owners of vacant sites within the GBA limits shall ensure that all waste, garbage, and debris accumulated on their vacant site/s are removed on or before <strong>15.08.2026</strong>. The waste/debris shall be disposed of only at the designated disposal locations identified & already notified by the Municipal Corporation. If necessary, owners may also avail the services of agencies notified by the respective Municipal Corporation for cleaning and disposal.<br>2. If the owners fail to clean their vacant sites by <strong>15.08.2026</strong>, the Municipal Corporation will undertake the removal of the waste/debris. The expenditure incurred will be recovered from the property owners along with property tax in accordance with bye-law 18(1)(d)(ii) of the Solid Waste Management Bye-laws, 2020 and Section 285(2) of the Greater Bengaluru Administration Act, 2024.",
+    rule_behind_it: "Bye-law 18(1)(b) of the Solid Waste Management Bye-laws, 2020 places the mandatory responsibility for maintaining vacant sites in a clean and hygienic condition on the owner.",
+    consequences: "The notice states that the Municipal Corporation will undertake removal of the waste itself, and that the expenditure incurred will be recovered as shown in the table below from the property owners along with property tax in accordance with bye-law 18(1)(d)(ii) of the Solid Waste Management Bye-laws, 2020 and Section 285(2) of the Greater Bengaluru Administration Act, 2024.\n\nThis is not a fine. It is the Corporation's cost of doing the work, recovered through your property tax.",
     rates: [
       { dimensions: "20 × 30 = 600 sq. ft. (55.74 sq. m.)", no_wall: "₹6,700", with_wall: "₹7,700", transport: "₹19,200" },
       { dimensions: "30 × 40 = 1,200 sq. ft. (111.48 sq. m.)", no_wall: "₹13,400", with_wall: "₹14,400", transport: "₹38,400" },
@@ -47,29 +50,7 @@ const DEFAULT_CIVIC_NOTICES = [
       { dimensions: "40 × 60 = 2,400 sq. ft. (222.97 sq. m.)", no_wall: "₹26,800", with_wall: "₹27,800", transport: "₹76,800" },
       { dimensions: "50 × 80 = 4,000 sq. ft. (371.61 sq. m.)", no_wall: "₹46,700", with_wall: "₹47,700", transport: "₹1,28,000" }
     ],
-    pdf_url: "sample-report.pdf",
-    pdf_filename: "GBA_Vacant_Site_Clearing_Notice_Aug2026.pdf",
     created_at: "2026-08-10T10:00:00Z"
-  },
-  {
-    id: "notice-gba-2026-002",
-    slug: "solid-waste-management-byelaw-2020-fencing-mandate",
-    entry_label: "ENTRY 2 — MANDATORY SITE FENCING & MAINTENANCE",
-    title: "Mandatory Perimeter Fencing & Debris Barrier Compliance for Unbuilt Sites",
-    issued_date: "2026-07-28",
-    ref_number: "SWM/BYE-LAW/18/2026",
-    status: "Active Mandate — Inspection In Progress",
-    status_type: "warning",
-    is_published: true,
-    what_was_issued: "Notice to all vacant plot owners across Greater Bengaluru zone to erect visible compound boundary walls or barbed-wire mesh fencing to prevent illegal municipal dumping by commercial waste vendors.",
-    rule_behind_it: "Rule 18(2) of the Municipal Solid Waste Bye-laws 2020 and KMC Act Section 288.",
-    consequences: "Unfenced properties identified as chronic dumping zones will be penalised per metric tonne of accumulated waste alongside municipal clearance surcharges.",
-    rates: [
-      { dimensions: "Standard Plot Fencing (Chainlink)", no_wall: "₹120 / running ft", with_wall: "₹250 / running ft", transport: "Included" }
-    ],
-    pdf_url: "sample-report.pdf",
-    pdf_filename: "SWM_Fencing_Mandate_2026.pdf",
-    created_at: "2026-07-28T14:30:00Z"
   }
 ];
 
@@ -86,67 +67,32 @@ function getDeletedNoticeIds() {
 }
 
 async function loadAllCivicNotices() {
-  const deletedIds = getDeletedNoticeIds();
   let notices = [];
 
-  // 1. Check localStorage first
-  try {
-    const local = localStorage.getItem('propvigil_civic_notices');
-    if (local) {
-      const parsed = JSON.parse(local);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        notices = parsed;
-      }
-    }
-  } catch (e) {}
-
-  // 2. Try fetching from server API or static JSON file
+  // Try fetching from server API or static JSON file first
   try {
     const res = await fetch(getApiUrl('/api/civic-updates'));
     const data = await res.json();
     if (data.success && Array.isArray(data.notices) && data.notices.length > 0) {
-      data.notices.forEach(n => {
-        if (!notices.some(item => (item.id && item.id === n.id) || (item.slug && item.slug === n.slug))) {
-          notices.push(n);
-        }
-      });
+      notices = data.notices;
     }
-  } catch (e) {
+  } catch (e) {}
+
+  if (notices.length === 0) {
     try {
       const resFile = await fetch('data/civic_notices.json');
       const fileData = await resFile.json();
       if (Array.isArray(fileData) && fileData.length > 0) {
-        fileData.forEach(n => {
-          if (!notices.some(item => (item.id && item.id === n.id) || (item.slug && item.slug === n.slug))) {
-            notices.push(n);
-          }
-        });
+        notices = fileData;
       }
     } catch (err) {}
   }
 
-  // 3. Fallback to default seed notices if empty
   if (notices.length === 0) {
     notices = [...DEFAULT_CIVIC_NOTICES];
-  } else {
-    // Ensure default notices exist unless explicitly deleted
-    DEFAULT_CIVIC_NOTICES.forEach(def => {
-      if (!deletedIds.includes(def.id) && !deletedIds.includes(def.slug)) {
-        if (!notices.some(item => item.id === def.id || item.slug === def.slug)) {
-          notices.push(def);
-        }
-      }
-    });
   }
 
-  // Filter out any explicitly deleted notices
-  notices = notices.filter(n => !deletedIds.includes(n.id) && !deletedIds.includes(n.slug));
-
   civicNoticesData = notices;
-  try {
-    localStorage.setItem('propvigil_civic_notices', JSON.stringify(civicNoticesData));
-  } catch (e) {}
-
   return civicNoticesData;
 }
 
@@ -190,7 +136,7 @@ async function initCivicUpdates() {
 function filterAndRenderNotices(searchQuery, filterType) {
   let list = civicNoticesData.filter(n => n.is_published !== false);
 
-  if (filterType !== 'all') {
+  if (filterType && filterType !== 'all') {
     list = list.filter(n => n.status_type === filterType);
   }
 
@@ -215,19 +161,16 @@ function renderCivicNotices(notices) {
   if (!notices || notices.length === 0) {
     container.innerHTML = `
       <div style="text-align: center; padding: 60px 20px; background: white; border-radius: 16px; border: 1px solid var(--border-light);">
-        <h3 style="color: var(--brand-navy); margin-bottom: 8px;">No matching civic notices found</h3>
-        <p style="color: var(--text-muted);">Try adjusting your search query or filter criteria.</p>
+        <h3 style="color: var(--brand-navy); margin-bottom: 8px;">No government notices available</h3>
+        <p style="color: var(--text-muted);">Please check back soon for official civic and municipal updates.</p>
       </div>
     `;
     return;
   }
 
   container.innerHTML = notices.map(item => {
-    const badgeClass = item.status_type || 'warning';
-    const badgeText = item.status_type === 'danger' ? 'Deadline Passed' : (item.status_type === 'success' ? 'Compliant' : 'Active Mandate');
-    
     let ratesHtml = '';
-    if (item.rates && item.rates.length > 0) {
+    if (item.rates && Array.isArray(item.rates) && item.rates.length > 0) {
       ratesHtml = `
         <div style="margin-bottom: 28px;">
           <h3 style="font-size: 1.2rem; color: var(--brand-navy); margin-bottom: 12px;">RATES PUBLISHED IN THE NOTICE</h3>
@@ -235,21 +178,29 @@ function renderCivicNotices(notices) {
             <table class="plain-data-table">
               <thead>
                 <tr>
-                  <th>Site dimensions</th>
-                  <th>Cleaning — no wall</th>
-                  <th>Cleaning — with wall</th>
-                  <th>Transportation</th>
+                  <th>Sl. No.</th>
+                  <th>Site Dimensions</th>
+                  <th>Cleaning Charges (Without Compound Wall)</th>
+                  <th>Cleaning Charges (With Compound Wall)</th>
+                  <th>Waste/Debris Transportation Charges</th>
                 </tr>
               </thead>
               <tbody>
-                ${item.rates.map(r => `
+                ${item.rates.map((r, rIdx) => `
                   <tr>
+                    <td>${rIdx + 1}</td>
                     <td><strong>${r.dimensions}</strong></td>
                     <td>${r.no_wall || '-'}</td>
                     <td>${r.with_wall || '-'}</td>
                     <td>${r.transport || '-'}</td>
                   </tr>
                 `).join('')}
+                <tr>
+                  <td>${item.rates.length + 1}</td>
+                  <td colspan="4" style="color: var(--text-muted); font-style: italic; background: #F8FAFC;">
+                    In case, site dimension/area exceeding above limit, expenditure proportionate to the site area will be recovered.
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -257,22 +208,53 @@ function renderCivicNotices(notices) {
       `;
     }
 
+    const docImg = item.document_img || (item.slug === 'gba-vacant-site-clearing-notice-2026' ? 'assets/gba-public-notice-2026.jpg' : '');
+    const docHtml = docImg ? `
+      <!-- Attached Official Government Public Notice Document -->
+      <div class="official-doc-attachment-card" style="margin: 0 0 28px 0; border: 1.5px solid var(--border-gold); background: #F8FAFC; border-radius: var(--radius-md); padding: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.04);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: var(--brand-navy); color: var(--brand-gold); border-radius: 6px; font-weight: bold; font-size: 1.1rem;">📄</span>
+            <div>
+              <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--brand-navy); margin: 0;">Attached Government Public Notice Document</h4>
+              <p style="font-size: 0.82rem; color: var(--text-muted); margin: 2px 0 0 0;">Official scan from Greater Bengaluru Authority · Ref. ${item.ref_number || 'CC/PS/PR/240/2026-27'}</p>
+            </div>
+          </div>
+          <a href="${docImg}" target="_blank" class="btn-pdf-download" style="padding: 8px 16px; font-size: 0.82rem;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            <span>Open Full Document</span>
+          </a>
+        </div>
+
+        <div style="background: white; border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 12px; text-align: center;">
+          <a href="${docImg}" target="_blank" title="Click to view full high-resolution notice document">
+            <img src="${docImg}" alt="Official Greater Bengaluru Authority Public Notice" style="max-width: 100%; height: auto; max-height: 580px; object-fit: contain; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.005)'" onmouseout="this.style.transform='scale(1)'">
+          </a>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 12px; margin-bottom: 0;">
+            🔍 <em>Click the document above to view or download full-size original notice scan</em>
+          </p>
+        </div>
+      </div>
+    ` : '';
+
     return `
       <div class="notice-card-elevated reveal-on-scroll revealed" id="${item.slug}" style="margin-bottom: 36px;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
-          <span style="font-size: 0.85rem; font-weight: 700; color: var(--brand-gold); text-transform: uppercase;">${item.entry_label || 'CIVIC NOTICE'}</span>
-          <span class="status-badge-tag ${badgeClass}">${badgeText}</span>
+          <span style="font-size: 0.85rem; font-weight: 700; color: var(--brand-gold); text-transform: uppercase;">${item.entry_label || 'GOVERNMENT PUBLIC NOTICE — GREATER BENGALURU AUTHORITY'}</span>
+          <span class="status-badge-tag official">OFFICIAL NOTICE</span>
         </div>
 
         <h2 style="font-size: 2rem; color: var(--brand-navy); margin: 6px 0 12px 0;">${item.title}</h2>
         
         <p style="font-size: 0.9rem; color: var(--text-muted); padding-bottom: 20px; border-bottom: 1px solid var(--border-light); margin-bottom: 24px;">
-          Issued ${item.issued_date || 'N/A'} · Ref. ${item.ref_number || 'N/A'} · ${item.status || ''}
+          Issued ${item.issued_date || 'N/A'} · Ref. ${item.ref_number || 'N/A'} · Office of the Chief Commissioner
         </p>
+
+        ${docHtml}
 
         <div style="margin-bottom: 24px;">
           <h3 style="font-size: 1.2rem; color: var(--brand-navy); margin-bottom: 8px;">WHAT WAS ISSUED</h3>
-          <p>${item.what_was_issued || ''}</p>
+          <div style="color: var(--text-body); line-height: 1.7;">${item.what_was_issued || ''}</div>
         </div>
 
         ${item.slug === 'gba-vacant-site-clearing-notice-2026' ? `
@@ -303,13 +285,13 @@ function renderCivicNotices(notices) {
         ${ratesHtml}
 
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border-light);">
-          <a href="https://wa.me/919242143775?text=Hello%20PropVigil%20Team,%20please%20send%20me%20the%20original%20Notice%20PDF%20Ref%20${encodeURIComponent(item.ref_number || item.title)}" target="_blank" class="btn-pdf-download">
+          <a href="${docImg || 'assets/gba-public-notice-2026.jpg'}" target="_blank" class="btn-pdf-download">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-            <span>Request Original PDF Notice via WhatsApp</span>
+            <span>View / Download Official Notice</span>
           </a>
 
-          <a href="https://wa.me/919242143775" target="_blank" class="btn btn-whatsapp" style="padding: 14px 28px;">
-            <span>Need site compliance care? Contact us on WhatsApp</span>
+          <a href="https://wa.me/919242143775?text=Hello%20PropVigil%20Team,%20I%20saw%20the%20GBA%20vacant%20site%20clearing%20public%20notice.%20I%20need%20assistance%20with%20site%20inspection%20and%20clearing." target="_blank" class="btn btn-whatsapp" style="padding: 14px 28px;">
+            <span>Need site clearing? Contact us on WhatsApp</span>
           </a>
         </div>
       </div>
@@ -410,57 +392,111 @@ function initScrollReveal() {
   revealElements.forEach(el => revealObserver.observe(el));
 }
 
-// Form Submission & Contact API Handler
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+}
+
+// Form Submission & Contact API Handler (6 Fields, Email & WhatsApp Support)
 function initFormHandler() {
-  const callbackForm = document.getElementById('callback-form');
-  const toastFeedback = document.getElementById('contact-toast-feedback');
+  const forms = document.querySelectorAll('.propvigil-intake-form, #callback-form');
 
-  if (callbackForm) {
-    callbackForm.addEventListener('submit', async (e) => {
+  forms.forEach(form => {
+    // 1. Submit Event (Primary Button: "Send details" / Enter key)
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
-
-      const name = document.getElementById('field-name').value;
-      const country = document.getElementById('field-country').value;
-      const phone = document.getElementById('field-phone').value;
-      const propType = document.getElementById('field-proptype').value;
-      const location = document.getElementById('field-location').value;
-      const callTime = document.getElementById('field-calltime').value;
-      const notes = document.getElementById('field-notes')?.value || '';
-
-      const formData = {
-        name,
-        country,
-        phone,
-        prop_type: propType,
-        location,
-        preferred_time: callTime,
-        notes
-      };
-
-      if (toastFeedback) {
-        toastFeedback.className = 'toast-feedback success';
-        toastFeedback.style.display = 'block';
-        toastFeedback.textContent = 'Sending callback request to saikrupaassociates@gmail.com...';
-      }
-
-      try {
-        await fetch(getApiUrl('/api/contact'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
-        });
-      } catch (err) {
-        console.log('Backend contact API logged locally');
-      }
-
-      if (toastFeedback) {
-        toastFeedback.textContent = '✓ Request submitted! Email dispatched to saikrupaassociates@gmail.com and WhatsApp opened.';
-      }
-
-      const message = `Hello PropVigil Team,%0A%0ACallback Request:%0A- Name: ${encodeURIComponent(name)}%0A- Country: ${encodeURIComponent(country)}%0A- Phone: ${encodeURIComponent(phone)}%0A- Property Type: ${encodeURIComponent(propType)}%0A- Location: ${encodeURIComponent(location)}%0A- Preferred Call Time: ${encodeURIComponent(callTime)}${notes ? `%0A- Notes: ${encodeURIComponent(notes)}` : ''}`;
-
-      window.open(`https://wa.me/919242143775?text=${message}`, '_blank');
+      processFormSubmission(form, false);
     });
+
+    // 2. WhatsApp Button Click (Secondary Button: "Or send on WhatsApp")
+    const waBtn = form.querySelector('.btn-whatsapp-submit');
+    if (waBtn) {
+      waBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        processFormSubmission(form, true);
+      });
+    }
+  });
+
+  async function processFormSubmission(form, isWhatsAppMode) {
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const name = (form.querySelector('[name="name"]') || form.querySelector('#field-name'))?.value.trim() || '';
+    const phone = (form.querySelector('[name="phone"]') || form.querySelector('#field-phone'))?.value.trim() || '';
+    const propType = (form.querySelector('[name="prop_type"]') || form.querySelector('#field-proptype'))?.value || '';
+    const location = (form.querySelector('[name="location"]') || form.querySelector('#field-location'))?.value.trim() || '';
+    const size = (form.querySelector('[name="size"]') || form.querySelector('#field-size'))?.value.trim() || '';
+    const notes = (form.querySelector('[name="notes"]') || form.querySelector('#field-notes'))?.value.trim() || '';
+
+    const formData = {
+      name,
+      phone,
+      prop_type: propType,
+      location,
+      size,
+      notes,
+      to_email: 'saikrupaassociates26@gmail.com',
+      submitted_at: new Date().toISOString()
+    };
+
+    // 1. Dispatch to local backend API
+    try {
+      fetch(getApiUrl('/api/contact'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+    } catch (err) {
+      console.log('Backend contact API logged');
+    }
+
+    // 2. Direct email delivery to saikrupaassociates26@gmail.com
+    try {
+      fetch('https://formsubmit.co/ajax/saikrupaassociates26@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          _subject: `New Property Details from ${name} (${location})`,
+          Name: name,
+          WhatsApp_Number: phone,
+          Property_Owned: propType,
+          Property_Location: location,
+          Property_Size: size,
+          Additional_Notes: notes || 'None',
+          _template: 'table'
+        })
+      });
+    } catch (e) {}
+
+    // 3. If WhatsApp button clicked, open WhatsApp chat
+    if (isWhatsAppMode) {
+      const message = `Hello PropVigil Team,%0A%0AHere are my property details:%0A- Name: ${encodeURIComponent(name)}%0A- WhatsApp: ${encodeURIComponent(phone)}%0A- What I own: ${encodeURIComponent(propType)}%0A- Location: ${encodeURIComponent(location)}%0A- Size: ${encodeURIComponent(size)}${notes ? `%0A- Notes: ${encodeURIComponent(notes)}` : ''}`;
+      window.open(`https://wa.me/919242143775?text=${message}`, '_blank');
+    }
+
+    // 4. Replace form with confirmation message
+    const formCard = form.closest('.form-card') || form.parentElement;
+    if (formCard) {
+      formCard.innerHTML = `
+        <div class="form-confirmation-card" style="padding: 36px 20px; text-align: center; background: #FFFFFF; border: 1.5px solid var(--border-gold); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); animation: fadeIn 0.4s ease;">
+          <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(16,185,129,0.12); color: #059669; font-size: 1.6rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto; border: 1px solid rgba(16,185,129,0.3);">✓</div>
+          <h3 style="font-size: 1.4rem; color: var(--brand-navy); margin-bottom: 12px; font-weight: 800;">Thank you, ${escapeHtml(name)}.</h3>
+          <p style="font-size: 1.05rem; color: var(--text-body); line-height: 1.6; max-width: 520px; margin: 0 auto 20px auto;">
+            We have your details for your property in <strong>${escapeHtml(location)}</strong>. V P Srinivasa will reply on WhatsApp within one working day.
+          </p>
+          <div style="background: #F8FAFC; border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 14px 20px; display: inline-block; margin-top: 6px;">
+            <span style="font-size: 0.88rem; color: var(--text-muted);">If it is urgent, call or message:</span><br>
+            <a href="tel:+919242143775" style="font-size: 1.15rem; font-weight: 800; color: var(--brand-navy); text-decoration: none;">+91 92421 43775</a>
+          </div>
+        </div>
+      `;
+    }
   }
 }
 
@@ -862,32 +898,7 @@ function initAdminPortal() {
     });
   }
 
-  // Tabs Handler
-  const tabBlogsBtn = document.getElementById('tabBlogsBtn');
-  const tabNoticesBtn = document.getElementById('tabNoticesBtn');
-  const sectionBlogs = document.getElementById('sectionBlogs');
-  const sectionNotices = document.getElementById('sectionNotices');
-
-  if (tabBlogsBtn && tabNoticesBtn) {
-    tabBlogsBtn.addEventListener('click', () => {
-      tabBlogsBtn.classList.add('active');
-      tabNoticesBtn.classList.remove('active');
-      sectionBlogs.style.display = 'block';
-      sectionNotices.style.display = 'none';
-      loadAdminBlogsTable();
-    });
-
-    tabNoticesBtn.addEventListener('click', () => {
-      tabNoticesBtn.classList.add('active');
-      tabBlogsBtn.classList.remove('active');
-      sectionNotices.style.display = 'block';
-      sectionBlogs.style.display = 'none';
-      loadAdminNoticesTable();
-    });
-  }
-
   initAdminBlogModal();
-  initAdminNoticeModal();
 }
 
 function showLogin() {
@@ -1727,163 +1738,5 @@ window.deleteBlog = async function(id) {
 
   showToast('✓ Blog post deleted from website and Google Sheet');
   loadAdminBlogsTable();
-};
-
-// Civic Notices Table Handler
-async function loadAdminNoticesTable() {
-  const tbody = document.getElementById('cmsNoticesTableBody');
-  if (!tbody) return;
-
-  const notices = await loadAllCivicNotices();
-
-  if (!notices || notices.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #64748B; padding: 40px;">No civic notices available. Click "+ Create Civic Notice" to add one.</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = notices.map(item => `
-    <tr>
-      <td>
-        <span class="cms-post-title">${item.title}</span>
-        <span class="cms-post-slug">Ref: ${item.ref_number || 'N/A'}</span>
-      </td>
-      <td style="color: #475569; font-weight: 600;">${item.issued_date || ''}</td>
-      <td>
-        <span class="badge-pub-status ${item.is_published !== false ? 'published' : 'draft'}">
-          ${item.is_published !== false ? 'PUBLISHED' : 'DRAFT'}
-        </span>
-      </td>
-      <td>
-        <div class="cms-actions-group" style="justify-content: flex-end; gap: 8px;">
-          <button onclick="togglePublishNotice('${item.id}', ${item.is_published === false})" class="btn-cms-action ${item.is_published !== false ? 'unpublish' : 'publish'}" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">
-            ${item.is_published !== false ? 'Unpublish' : 'Publish'}
-          </button>
-          <a href="civic-updates.html#${item.slug}" target="_blank" class="btn-cms-action view" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; text-decoration: none;">View</a>
-          <button onclick="deleteNotice('${item.id}')" class="btn-cms-action delete" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">Delete</button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-}
-
-window.togglePublishNotice = async function(id, publishState) {
-  const notice = civicNoticesData.find(n => (n.id && n.id === id) || (n.slug && n.slug === id));
-  if (notice) {
-    notice.is_published = publishState;
-    localStorage.setItem('propvigil_civic_notices', JSON.stringify(civicNoticesData));
-  }
-  try {
-    await fetch(getApiUrl('/api/admin/civic-updates/publish'), {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, is_published: publishState })
-    });
-  } catch (e) {}
-  showToast(publishState ? '✓ Civic notice published to website' : '✓ Civic notice unpublished (saved as draft)');
-  loadAdminNoticesTable();
-};
-
-function initAdminNoticeModal() {
-  const modal = document.getElementById('noticeModal');
-  const btnCreate = document.getElementById('btnCreateNotice');
-  const btnClose = document.getElementById('closeNoticeModal');
-  const btnCancel = document.getElementById('cancelNoticeModal');
-  const form = document.getElementById('noticeForm');
-
-  if (!modal || !form) return;
-
-  if (btnCreate) {
-    btnCreate.addEventListener('click', () => {
-      form.reset();
-      const dateEl = document.getElementById('noticeFormDate');
-      if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
-      modal.classList.add('open');
-    });
-  }
-
-  const closeModal = () => modal.classList.remove('open');
-  if (btnClose) btnClose.addEventListener('click', closeModal);
-  if (btnCancel) btnCancel.addEventListener('click', closeModal);
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const title = document.getElementById('noticeFormTitle').value.trim();
-    const ref = document.getElementById('noticeFormRef').value.trim();
-    const date = document.getElementById('noticeFormDate').value;
-    const statusType = document.getElementById('noticeFormStatusType').value;
-    const what = document.getElementById('noticeFormWhat').value.trim();
-    const rule = document.getElementById('noticeFormRule').value.trim();
-    const isPublished = document.getElementById('noticeFormPublished') ? document.getElementById('noticeFormPublished').checked : true;
-
-    const newId = 'notice-' + Date.now();
-    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || newId;
-    const entryNum = civicNoticesData.length + 1;
-    const entryLabel = `ENTRY ${entryNum} — ${title.toUpperCase().slice(0, 35)}`;
-
-    const newNotice = {
-      id: newId,
-      slug: slug,
-      entry_label: entryLabel,
-      title: title,
-      ref_number: ref,
-      issued_date: date || new Date().toISOString().split('T')[0],
-      status: statusType === 'danger' ? 'Deadline Passed' : (statusType === 'success' ? 'Compliant' : 'Active Mandate'),
-      status_type: statusType,
-      what_was_issued: what,
-      rule_behind_it: rule,
-      consequences: 'Failure to comply may result in municipal clearance action and recovery through property taxes.',
-      is_published: isPublished,
-      pdf_url: '',
-      pdf_filename: '',
-      created_at: new Date().toISOString()
-    };
-
-    // 1. Immediately prepend to local list and save to localStorage
-    civicNoticesData.unshift(newNotice);
-    localStorage.setItem('propvigil_civic_notices', JSON.stringify(civicNoticesData));
-
-    // 2. Try POSTing to server API if online
-    try {
-      await fetch(getApiUrl('/api/admin/civic-updates'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newNotice)
-      });
-    } catch (e) {}
-
-    closeModal();
-    showToast('✓ Civic notice created and published to website!');
-    loadAdminNoticesTable();
-  });
-}
-
-window.deleteNotice = async function(id) {
-  const notice = civicNoticesData.find(n => (n.id && n.id === id) || (n.slug && n.slug === id));
-  const targetTitle = notice ? notice.title : 'this civic notice';
-  if (!confirm(`Are you sure you want to delete "${targetTitle}"?`)) return;
-
-  const targetSlug = notice ? notice.slug : '';
-
-  // Track deleted notice ID and slug so defaults don't reappear
-  let deletedIds = getDeletedNoticeIds();
-  if (id && !deletedIds.includes(id)) deletedIds.push(id);
-  if (targetSlug && !deletedIds.includes(targetSlug)) deletedIds.push(targetSlug);
-  localStorage.setItem('propvigil_deleted_notices', JSON.stringify(deletedIds));
-
-  // Remove from memory and localStorage
-  civicNoticesData = civicNoticesData.filter(n => n.id !== id && (!targetSlug || n.slug !== targetSlug));
-  localStorage.setItem('propvigil_civic_notices', JSON.stringify(civicNoticesData));
-
-  // Call server DELETE API if online
-  try {
-    await fetch(getApiUrl('/api/admin/civic-updates'), {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, slug: targetSlug, title: targetTitle })
-    });
-  } catch (e) {}
-
-  showToast('✓ Civic notice deleted from website');
-  loadAdminNoticesTable();
 };
 

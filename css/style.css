@@ -1828,11 +1828,20 @@ table.plain-data-table tr:nth-child(even) {
   border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-.status-badge-tag.info {
-  background: rgba(37, 99, 235, 0.12);
-  color: #2563EB;
-  border: 1px solid rgba(37, 99, 235, 0.3);
+.status-badge-tag.official {
+  background: rgba(27, 58, 95, 0.08);
+  color: var(--brand-navy);
+  border: 1px solid rgba(27, 58, 95, 0.25);
 }
+
+.official-doc-attachment-card {
+  transition: var(--transition);
+}
+
+.official-doc-attachment-card:hover {
+  box-shadow: 0 8px 24px rgba(27, 58, 95, 0.08);
+}
+
 
 .btn-pdf-download {
   display: inline-flex;

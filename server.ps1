@@ -624,14 +624,13 @@ try {
                     $contactRecord = [ordered]@{
                         id = "contact-" + (Get-Date -Format "yyyyMMddHHmmss")
                         name = if ($contactData.name) { $contactData.name } else { "" }
-                        country = if ($contactData.country) { $contactData.country } else { "" }
                         phone = if ($contactData.phone) { $contactData.phone } else { "" }
                         prop_type = if ($contactData.prop_type) { $contactData.prop_type } else { "" }
                         location = if ($contactData.location) { $contactData.location } else { "" }
-                        preferred_time = if ($contactData.preferred_time) { $contactData.preferred_time } else { "" }
+                        size = if ($contactData.size) { $contactData.size } else { "" }
                         notes = if ($contactData.notes) { $contactData.notes } else { "" }
                         submitted_at = (Get-Date).ToString("o")
-                        target_email = "saikrupaassociates@gmail.com"
+                        target_email = "saikrupaassociates26@gmail.com"
                     }
                     $existingContacts.Add($contactRecord) | Out-Null
                     
@@ -646,10 +645,10 @@ try {
                     }
                     Set-Content -Path $contactLogFile -Value $cJsonStr -Encoding UTF8
 
-                    Write-Host " [CONTACT FORM API] Callback received from: $($contactData.name) ($($contactData.phone)) for $($contactData.location)" -ForegroundColor Yellow
+                    Write-Host " [CONTACT FORM API] Submission received from: $($contactData.name) ($($contactData.phone)) for $($contactData.location)" -ForegroundColor Yellow
                     Write-JsonResponse $response 200 @{ 
                         success = $true; 
-                        message = "Callback request received. Email dispatched to saikrupaassociates@gmail.com";
+                        message = "Property details received. Email dispatched to saikrupaassociates26@gmail.com";
                         details = $contactRecord
                     }
                     continue
