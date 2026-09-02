@@ -258,7 +258,7 @@ function renderCivicNotices(notices) {
         </div>
 
         ${item.slug === 'gba-vacant-site-clearing-notice-2026' ? `
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 24px 0; border: 1.5px solid var(--border-gold); padding: 16px; border-radius: var(--radius-md); background: var(--bg-dark);">
+          <div class="civic-visual-compare-grid">
             <div style="border-radius: var(--radius-sm); overflow: hidden; position: relative;">
               <span style="position: absolute; top: 10px; left: 10px; background: rgba(239,68,68,0.9); color: white; padding: 4px 10px; font-size: 0.75rem; font-weight: bold; border-radius: 99px;">NON-COMPLIANT SITE</span>
               <img src="assets/before.jpg" alt="Uncleared Vacant Site in Bengaluru" style="width: 100%; height: 200px; object-fit: cover; display: block;">
@@ -361,14 +361,45 @@ function initMobileNav() {
   const navMenu = document.querySelector('.nav-menu');
 
   if (toggleBtn && navMenu) {
-    toggleBtn.addEventListener('click', () => {
-      navMenu.classList.toggle('active');
+    // Inject smooth animated hamburger bars if not present
+    if (!toggleBtn.querySelector('.hamburger-box')) {
+      toggleBtn.innerHTML = '<span class="hamburger-box"><span class="hamburger-bar"></span><span class="hamburger-bar"></span><span class="hamburger-bar"></span></span>';
+    }
+
+    const toggleMenu = (forceState) => {
+      const isOpening = typeof forceState === 'boolean' ? forceState : !navMenu.classList.contains('active');
+      if (isOpening) {
+        navMenu.classList.add('active');
+        toggleBtn.classList.add('open');
+        toggleBtn.setAttribute('aria-expanded', 'true');
+      } else {
+        navMenu.classList.remove('active');
+        toggleBtn.classList.remove('open');
+        toggleBtn.setAttribute('aria-expanded', 'false');
+      }
+    };
+
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMenu();
     });
 
     navMenu.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', () => {
-        navMenu.classList.remove('active');
+        toggleMenu(false);
       });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!navMenu.contains(e.target) && !toggleBtn.contains(e.target) && navMenu.classList.contains('active')) {
+        toggleMenu(false);
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+        toggleMenu(false);
+      }
     });
   }
 }
